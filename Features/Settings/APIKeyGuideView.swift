@@ -56,8 +56,9 @@ struct APIKeyGuideView: View {
     private var introSection: some View {
         Section {
             Text("本 App 使用你自己的 AI 平台账号进行图片识别。你需要在对应平台注册并创建 API Key，然后填入「AI 配置」页面。费用由各平台按用量向你收取。")
-                .font(.system(size: AppTheme.FontSize.body))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                 .foregroundStyle(AppTheme.Colors.secondaryText)
+                .lineSpacing(6)
                 .padding(.vertical, AppTheme.Spacing.xs)
         }
     }
@@ -67,24 +68,30 @@ struct APIKeyGuideView: View {
             ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
                 HStack(alignment: .top, spacing: AppTheme.Spacing.md) {
                     Text("\(index + 1)")
-                        .font(.system(size: AppTheme.FontSize.caption, weight: .bold))
-                        .foregroundStyle(.white)
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .regular))
+                        .foregroundStyle(AppTheme.Colors.accent)
                         .frame(width: 22, height: 22)
-                        .background(AppTheme.Colors.accent)
-                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(AppTheme.Colors.accent, lineWidth: 0.75)
+                        )
 
                     Text(step)
-                        .font(.system(size: AppTheme.FontSize.body))
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                         .foregroundStyle(AppTheme.Colors.primaryText)
+                        .lineSpacing(6)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.vertical, AppTheme.Spacing.xs)
             }
         } header: {
             Text(title)
+                .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))
+                .tracking(1.5)
+                .textCase(.uppercase)
         } footer: {
             Text("平台：\(platform)（\(url)）")
-                .font(.system(size: AppTheme.FontSize.footnote))
+                .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .light))
         }
     }
 
@@ -92,16 +99,20 @@ struct APIKeyGuideView: View {
         Section {
             Label {
                 Text("请前往对应平台官网查看你的 Token 用量与账单。本 App 内显示的费用仅为按次数的粗略估算，实际扣费以平台为准。")
-                    .font(.system(size: AppTheme.FontSize.caption))
+                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
                     .foregroundStyle(AppTheme.Colors.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             } icon: {
                 Image(systemName: "exclamationmark.triangle")
-                    .foregroundStyle(AppTheme.Colors.goldGlow)
+                    .font(.system(size: AppTheme.FontSize.body, weight: .light))
+                    .foregroundStyle(Color.orange.opacity(0.55))
             }
             .padding(.vertical, AppTheme.Spacing.xs)
         } header: {
             Text("关于用量与计费")
+                .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))
+                .tracking(1.5)
+                .textCase(.uppercase)
         }
     }
 }

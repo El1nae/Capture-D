@@ -10,6 +10,19 @@ class ShareViewController: UIViewController {
             .appendingPathComponent("Pending", isDirectory: true)
     }()
 
+    // MARK: - 日系极简 · 浅绿 配色
+    private let accentColor = UIColor(red: 0.49, green: 0.569, blue: 0.447, alpha: 1)      // #7D9172 鼠尾草绿
+    private let tertiaryTextColor = UIColor(red: 0.722, green: 0.718, blue: 0.69, alpha: 1) // #B8B7B0
+
+    /// 系统衬线字体
+    private func serifFont(ofSize size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
+        let base = UIFont.systemFont(ofSize: size, weight: weight)
+        if let descriptor = base.fontDescriptor.withDesign(.serif) {
+            return UIFont(descriptor: descriptor, size: size)
+        }
+        return base
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -21,7 +34,7 @@ class ShareViewController: UIViewController {
 
         let titleLabel = UILabel()
         titleLabel.text = "保存到 Capture:D"
-        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleLabel.font = serifFont(ofSize: 17, weight: .regular)
         titleLabel.textAlignment = .center
 
         let stackView = UIStackView()
@@ -33,12 +46,12 @@ class ShareViewController: UIViewController {
         for name in categories {
             let button = UIButton(type: .system)
             button.setTitle(name, for: .normal)
-            button.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
-            button.layer.cornerRadius = 12
+            button.titleLabel?.font = serifFont(ofSize: 15, weight: .regular)
+            button.layer.cornerRadius = 22
             button.layer.borderWidth = 1
-            button.layer.borderColor = UIColor.systemBlue.cgColor
-            button.backgroundColor = .secondarySystemBackground
-            button.setTitleColor(.label, for: .normal)
+            button.layer.borderColor = accentColor.cgColor
+            button.backgroundColor = .clear
+            button.setTitleColor(accentColor, for: .normal)
             button.addAction(UIAction { [weak self] _ in
                 self?.toggleCategory(name, button: button)
             }, for: .touchUpInside)
@@ -48,10 +61,10 @@ class ShareViewController: UIViewController {
 
         let confirmButton = UIButton(type: .system)
         confirmButton.setTitle("确认", for: .normal)
-        confirmButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        confirmButton.backgroundColor = .systemBlue
+        confirmButton.titleLabel?.font = serifFont(ofSize: 17, weight: .regular)
+        confirmButton.backgroundColor = accentColor
         confirmButton.setTitleColor(.white, for: .normal)
-        confirmButton.layer.cornerRadius = 12
+        confirmButton.layer.cornerRadius = 24
         confirmButton.addAction(UIAction { [weak self] _ in
             self?.confirm()
         }, for: .touchUpInside)
@@ -59,6 +72,8 @@ class ShareViewController: UIViewController {
 
         let cancelButton = UIButton(type: .system)
         cancelButton.setTitle("取消", for: .normal)
+        cancelButton.titleLabel?.font = serifFont(ofSize: 15, weight: .regular)
+        cancelButton.setTitleColor(tertiaryTextColor, for: .normal)
         cancelButton.addAction(UIAction { [weak self] _ in
             self?.cancel()
         }, for: .touchUpInside)
@@ -79,11 +94,11 @@ class ShareViewController: UIViewController {
     private func toggleCategory(_ name: String, button: UIButton) {
         if selectedCategories.contains(name) {
             selectedCategories.remove(name)
-            button.backgroundColor = .secondarySystemBackground
-            button.setTitleColor(.label, for: .normal)
+            button.backgroundColor = .clear
+            button.setTitleColor(accentColor, for: .normal)
         } else {
             selectedCategories.insert(name)
-            button.backgroundColor = .systemBlue
+            button.backgroundColor = accentColor
             button.setTitleColor(.white, for: .normal)
         }
     }

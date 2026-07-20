@@ -21,9 +21,10 @@ struct UnsortedFilesView: View {
             if files.isEmpty {
                 VStack(spacing: AppTheme.Spacing.md) {
                     Image(systemName: "checkmark.circle")
-                        .font(.system(size: 48))
+                        .font(.system(size: 48, weight: .thin))
                         .foregroundStyle(AppTheme.Colors.tertiaryText)
                     Text("没有未整理的文件")
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                         .foregroundStyle(AppTheme.Colors.secondaryText)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -61,6 +62,7 @@ struct UnsortedFilesView: View {
         return HStack {
             // 选择框
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                .font(.system(size: AppTheme.FontSize.headline, weight: .light))
                 .foregroundStyle(isSelected ? AppTheme.Colors.accent : AppTheme.Colors.tertiaryText)
                 .onTapGesture { toggleSelection(fileID) }
 
@@ -77,9 +79,10 @@ struct UnsortedFilesView: View {
 
             VStack(alignment: .leading) {
                 Text(file.title)
-                    .font(.system(size: AppTheme.FontSize.body))
+                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
+                    .foregroundStyle(AppTheme.Colors.primaryText)
                 Text("\(file.images.count) 张图片")
-                    .font(.system(size: AppTheme.FontSize.caption))
+                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
                     .foregroundStyle(AppTheme.Colors.tertiaryText)
             }
 
@@ -91,6 +94,7 @@ struct UnsortedFilesView: View {
                 editingName = ""
             }) {
                 Image(systemName: "pencil")
+                    .font(.system(size: AppTheme.FontSize.body, weight: .light))
                     .foregroundStyle(AppTheme.Colors.secondaryText)
             }
         }
@@ -101,7 +105,7 @@ struct UnsortedFilesView: View {
     private var bottomBar: some View {
         HStack {
             Text("已选 \(selectedFiles.count) 项")
-                .font(.system(size: AppTheme.FontSize.caption))
+                .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
                 .foregroundStyle(AppTheme.Colors.secondaryText)
 
             Spacer()
@@ -129,11 +133,11 @@ struct UnsortedFilesView: View {
                 VStack {
                     Spacer()
                     Text(message)
-                        .font(.system(size: AppTheme.FontSize.caption))
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
                         .foregroundStyle(.white)
                         .padding(.horizontal, AppTheme.Spacing.md)
                         .padding(.vertical, AppTheme.Spacing.sm)
-                        .background(Color.black.opacity(0.7))
+                        .background(AppTheme.Colors.primaryText)
                         .clipShape(Capsule())
                         .padding(.bottom, 80)
                 }

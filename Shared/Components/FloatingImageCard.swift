@@ -22,7 +22,9 @@ struct FloatingImageCard: View {
     var body: some View {
         VStack(spacing: AppTheme.Spacing.xs) {
             Text(capturedAt.formatted(date: .abbreviated, time: .shortened))
-                .timeLabelStyle()
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.footnote, weight: .light))
+                .tracking(0.6)
+                .foregroundStyle(AppTheme.Colors.tertiaryText)
 
             if let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
@@ -31,9 +33,9 @@ struct FloatingImageCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.large))
                     .overlay(
                         RoundedRectangle(cornerRadius: AppTheme.CornerRadius.large)
-                            .stroke(showGoldGlow ? AppTheme.Colors.goldGlow : .clear, lineWidth: 3)
+                            .stroke(showGoldGlow ? AppTheme.Colors.goldGlow : .clear, lineWidth: 2)
                     )
-                    .shadow(color: showGoldGlow ? AppTheme.Colors.goldGlow.opacity(0.4) : .clear, radius: 8)
+                    .shadow(color: showGoldGlow ? AppTheme.Colors.goldGlow.opacity(0.25) : .clear, radius: 6)
                     .padding(.horizontal, AppTheme.Spacing.lg)
                     .onLongPressGesture {
                         let generator = UIImpactFeedbackGenerator(style: .medium)

@@ -36,7 +36,7 @@ struct WaterfallGrid<Data: RandomAccessCollection, Content: View>: View where Da
                         }
                     }
                 }
-                .padding(.horizontal, spacing / 2)
+                .padding(.horizontal, 14)
             }
         }
     }

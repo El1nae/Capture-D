@@ -5,11 +5,12 @@ struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: AppTheme.Spacing.lg) {
             Image(systemName: "square.and.arrow.up")
-                .font(.system(size: 48))
+                .font(.system(size: 44))
                 .foregroundStyle(AppTheme.Colors.tertiaryText)
 
             Text("还没有收藏")
-                .font(.system(size: AppTheme.FontSize.title, weight: .medium))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.title, weight: .light))
+                .tracking(0.8)
                 .foregroundStyle(AppTheme.Colors.secondaryText)
 
             VStack(spacing: AppTheme.Spacing.sm) {
@@ -17,7 +18,7 @@ struct EmptyStateView: View {
                 Text("点击分享 → 选择 Capture:D → 选分类")
                 Text("图片就会保存在这里")
             }
-            .font(.system(size: AppTheme.FontSize.body))
+            .font(AppTheme.Fonts.sans(AppTheme.FontSize.body, weight: .light))
             .foregroundStyle(AppTheme.Colors.tertiaryText)
             .multilineTextAlignment(.center)
 

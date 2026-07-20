@@ -11,8 +11,9 @@ struct CategoryFilterBar: View {
                     Button(action: { toggleCategory(category) }) {
                         HStack(spacing: 4) {
                             Image(systemName: category.iconName)
-                                .font(.system(size: 14))
+                                .font(.system(size: 12, weight: .light))
                             Text(category.rawValue)
+                                .tracking(0.5)
                         }
                     }
                     .buttonStyle(CategoryButtonStyle(isSelected: selectedCategory == category))

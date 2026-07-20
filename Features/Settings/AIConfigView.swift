@@ -9,6 +9,8 @@ struct AIConfigView: View {
     @State private var keyInputs: [String: String] = [:]
     /// 已保存提示
     @State private var savedProvider: String?
+    /// 当前聚焦的输入框
+    @FocusState private var focusedProvider: String?
 
     var body: some View {
         List {
@@ -21,10 +23,10 @@ struct AIConfigView: View {
                         HStack {
                             VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                                 Text(service.displayName)
-                                    .font(.system(size: AppTheme.FontSize.body, weight: .medium))
+                                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .regular))
                                     .foregroundStyle(AppTheme.Colors.primaryText)
                                 Text(keychain.hasKey(for: service.providerID) ? "已配置密钥" : "未配置密钥")
-                                    .font(.system(size: AppTheme.FontSize.caption))
+                                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
                                     .foregroundStyle(
                                         keychain.hasKey(for: service.providerID)
                                             ? AppTheme.Colors.secondaryText
@@ -34,7 +36,7 @@ struct AIConfigView: View {
                             Spacer()
                             if ai.currentProvider == service.providerID {
                                 Image(systemName: "checkmark")
-                                    .font(.system(size: AppTheme.FontSize.body, weight: .semibold))
+                                    .font(.system(size: AppTheme.FontSize.body, weight: .light))
                                     .foregroundStyle(AppTheme.Colors.accent)
                             }
                         }
@@ -42,9 +44,12 @@ struct AIConfigView: View {
                 }
             } header: {
                 Text("选择 AI 平台")
+                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))
+                    .tracking(1.5)
+                    .textCase(.uppercase)
             } footer: {
                 Text("当前使用：\(ai.currentService.displayName)")
-                    .font(.system(size: AppTheme.FontSize.footnote))
+                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .light))
             }
 
             // MARK: - API Key 输入
@@ -53,14 +58,28 @@ struct AIConfigView: View {
                     SecureField("输入 \(service.displayName) API Key", text: binding(for: service.providerID))
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
-                        .font(.system(size: AppTheme.FontSize.body))
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.body, weight: .light))
+                        .focused($focusedProvider, equals: service.providerID)
+                        .padding(.vertical, AppTheme.Spacing.sm)
+                        .padding(.horizontal, AppTheme.Spacing.md)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium)
+                                .stroke(
+                                    focusedProvider == service.providerID
+                                        ? AppTheme.Colors.accent
+                                        : AppTheme.Colors.primaryText.opacity(0.08),
+                                    lineWidth: 0.5
+                                )
+                        )
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
 
                     HStack {
                         Button {
                             save(for: service.providerID)
                         } label: {
                             Text("保存")
-                                .font(.system(size: AppTheme.FontSize.body, weight: .medium))
+                                .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .regular))
                         }
                         .disabled((keyInputs[service.providerID] ?? "").isEmpty)
 
@@ -68,19 +87,22 @@ struct AIConfigView: View {
 
                         if savedProvider == service.providerID {
                             Label("已保存", systemImage: "checkmark.circle.fill")
-                                .font(.system(size: AppTheme.FontSize.caption))
-                                .foregroundStyle(Color.green)
+                                .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
+                                .foregroundStyle(AppTheme.Colors.accent)
                         } else if keychain.hasKey(for: service.providerID) {
                             Button(role: .destructive) {
                                 delete(for: service.providerID)
                             } label: {
                                 Text("清除")
-                                    .font(.system(size: AppTheme.FontSize.caption))
+                                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .regular))
                             }
                         }
                     }
                 } header: {
                     Text("\(service.displayName) 密钥")
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))
+                        .tracking(1.5)
+                        .textCase(.uppercase)
                 }
             }
 
@@ -90,7 +112,7 @@ struct AIConfigView: View {
                     APIKeyGuideView()
                 } label: {
                     Label("如何获取 API Key？", systemImage: "questionmark.circle")
-                        .font(.system(size: AppTheme.FontSize.body))
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                 }
             }
         }

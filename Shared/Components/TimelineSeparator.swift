@@ -8,7 +8,8 @@ struct TimelineSeparator: View {
         HStack {
             Spacer()
             Text(date.formatted(date: .long, time: .omitted))
-                .font(.system(size: AppTheme.FontSize.footnote))
+                .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .light))
+                .tracking(0.8)
                 .foregroundStyle(AppTheme.Colors.tertiaryText)
                 .padding(.horizontal, AppTheme.Spacing.sm)
                 .padding(.vertical, AppTheme.Spacing.xs)

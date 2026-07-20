@@ -21,14 +21,26 @@ struct CollectionView: View {
             .navigationTitle("Capture:D")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Capture:D")
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.headline, weight: .light))
+                        .tracking(1.0)
+                        .foregroundStyle(AppTheme.Colors.primaryText)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { showSearch = true }) {
                         Image(systemName: "magnifyingglass")
+                            .font(.system(size: AppTheme.FontSize.headline, weight: .light))
+                            .foregroundStyle(AppTheme.Colors.accent)
+                            .opacity(0.7)
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink(destination: SettingsView()) {
                         Image(systemName: "gearshape")
+                            .font(.system(size: AppTheme.FontSize.headline, weight: .light))
+                            .foregroundStyle(AppTheme.Colors.accent)
+                            .opacity(0.7)
                     }
                 }
             }
@@ -78,6 +90,7 @@ struct CollectionView: View {
             .buttonStyle(.plain)
         }
         .padding(.top, AppTheme.Spacing.sm)
+        .padding(.horizontal, AppTheme.Spacing.xs)
     }
 
     private func fileCard(_ file: CollectionFile) -> some View {
@@ -95,12 +108,13 @@ struct CollectionView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(file.title)
-                    .font(.system(size: AppTheme.FontSize.caption, weight: .medium))
+                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .regular))
                     .foregroundStyle(AppTheme.Colors.primaryText)
                     .lineLimit(2)
 
                 Text(file.category.rawValue)
-                    .font(.system(size: AppTheme.FontSize.footnote))
+                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .light))
+                    .tracking(0.6)
                     .foregroundStyle(AppTheme.Colors.tertiaryText)
             }
             .padding(.horizontal, AppTheme.Spacing.sm)

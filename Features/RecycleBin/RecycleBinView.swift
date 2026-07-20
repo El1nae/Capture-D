@@ -15,9 +15,11 @@ struct RecycleBinView: View {
             if files.isEmpty {
                 VStack(spacing: AppTheme.Spacing.md) {
                     Image(systemName: "trash")
-                        .font(.system(size: 48))
+                        .font(.system(size: 48, weight: .thin))
                         .foregroundStyle(AppTheme.Colors.tertiaryText)
+                        .opacity(0.35)
                     Text("回收站是空的")
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                         .foregroundStyle(AppTheme.Colors.secondaryText)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -27,7 +29,8 @@ struct RecycleBinView: View {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(file.title)
-                                    .font(.system(size: AppTheme.FontSize.body, weight: .medium))
+                                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .regular))
+                                    .foregroundStyle(AppTheme.Colors.primaryText)
                                 HStack {
                                     Text(file.category.rawValue)
                                     if let deletedAt = file.deletedAt {
@@ -35,7 +38,7 @@ struct RecycleBinView: View {
                                         Text("· \(max(daysLeft, 0)) 天后永久删除")
                                     }
                                 }
-                                .font(.system(size: AppTheme.FontSize.caption))
+                                .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
                                 .foregroundStyle(AppTheme.Colors.tertiaryText)
                             }
 
@@ -44,7 +47,7 @@ struct RecycleBinView: View {
                             Button("恢复") {
                                 database.restore(file)
                             }
-                            .font(.system(size: AppTheme.FontSize.caption))
+                            .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .regular))
                             .foregroundStyle(AppTheme.Colors.accent)
                         }
                     }
@@ -58,6 +61,7 @@ struct RecycleBinView: View {
             if !files.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("清空", role: .destructive) { showClearAlert = true }
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .regular))
                         .foregroundStyle(AppTheme.Colors.destructive)
                 }
             }

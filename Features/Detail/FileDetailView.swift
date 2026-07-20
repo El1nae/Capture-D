@@ -25,6 +25,8 @@ struct FileDetailView: View {
 
                     if sortedBlocks.isEmpty {
                         Text("暂无内容")
+                            .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
+                            .tracking(0.6)
                             .foregroundStyle(AppTheme.Colors.tertiaryText)
                             .padding(AppTheme.Spacing.md)
                     }
@@ -44,9 +46,19 @@ struct FileDetailView: View {
         .navigationTitle(file.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(file.title)
+                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.headline, weight: .regular))
+                    .tracking(0.5)
+                    .foregroundStyle(AppTheme.Colors.primaryText)
+                    .lineLimit(1)
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { isEditing.toggle() }) {
                     Text(isEditing ? "完成" : "编辑")
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
+                        .tracking(0.5)
+                        .foregroundStyle(AppTheme.Colors.accent)
                 }
             }
         }

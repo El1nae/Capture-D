@@ -6,16 +6,18 @@ struct PrivacyPolicyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
                 Text("隐私政策")
-                    .font(.system(size: AppTheme.FontSize.largeTitle, weight: .bold))
+                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.largeTitle, weight: .light))
+                    .tracking(1)
                     .foregroundStyle(AppTheme.Colors.primaryText)
 
                 Text("最近更新：2026 年 7 月")
-                    .font(.system(size: AppTheme.FontSize.caption))
+                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
                     .foregroundStyle(AppTheme.Colors.tertiaryText)
 
                 Text("我们非常重视你的隐私。本页说明 Capture:D 如何处理你的数据。")
-                    .font(.system(size: AppTheme.FontSize.body))
+                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                     .foregroundStyle(AppTheme.Colors.secondaryText)
+                    .lineSpacing(6)
 
                 section(
                     title: "不访问相册",
@@ -53,13 +55,13 @@ struct PrivacyPolicyView: View {
     private func section(title: String, body: String) -> some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             Text(title)
-                .font(.system(size: AppTheme.FontSize.headline, weight: .semibold))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.headline, weight: .regular))
                 .foregroundStyle(AppTheme.Colors.primaryText)
             Text(body)
-                .font(.system(size: AppTheme.FontSize.body))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                 .foregroundStyle(AppTheme.Colors.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
-                .lineSpacing(4)
+                .lineSpacing(6)
         }
     }
 }

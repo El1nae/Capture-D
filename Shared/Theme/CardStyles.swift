@@ -1,22 +1,30 @@
 import SwiftUI
 
-/// 浮层卡片样式修饰符
+/// 浮层卡片 — 极淡阴影 + 细边框
 struct FloatingCardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(AppTheme.Colors.cardBackground)
+            .background(AppTheme.Colors.background)
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.card))
-            .shadow(color: .black.opacity(0.1), radius: AppTheme.Shadow.medium, y: 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppTheme.CornerRadius.card)
+                    .stroke(AppTheme.Colors.primaryText.opacity(0.06), lineWidth: 0.5)
+            )
+            .shadow(color: .black.opacity(0.04), radius: AppTheme.Shadow.medium, y: 2)
     }
 }
 
-/// 瀑布流卡片样式修饰符
+/// 瀑布流卡片 — 极淡阴影 + 细边框
 struct WaterfallCardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(AppTheme.Colors.cardBackground)
+            .background(AppTheme.Colors.background)
             .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium))
-            .shadow(color: .black.opacity(0.06), radius: AppTheme.Shadow.light, y: 1)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium)
+                    .stroke(AppTheme.Colors.primaryText.opacity(0.06), lineWidth: 0.5)
+            )
+            .shadow(color: .black.opacity(0.03), radius: AppTheme.Shadow.light, y: 1)
     }
 }
 

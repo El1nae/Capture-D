@@ -13,7 +13,7 @@ struct ImageGalleryOverlay: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.3)
+            Color.black.opacity(0.2)
                 .ignoresSafeArea()
                 .onTapGesture {
                     withAnimation(AppTheme.Animation.standard) {
@@ -78,18 +78,25 @@ struct ImageGalleryOverlay: View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
             ForEach(crossFiles, id: \.persistentModelID) { crossFile in
                 NavigationLink(destination: FileDetailView(file: crossFile)) {
-                    HStack {
+                    HStack(spacing: 5) {
                         Image(systemName: crossFile.category.iconName)
+                            .font(.system(size: AppTheme.FontSize.caption, weight: .light))
                         Text(crossFile.category.rawValue)
                         Text("·")
                         Text(crossFile.title)
                             .lineLimit(1)
                     }
-                    .font(.system(size: AppTheme.FontSize.caption))
-                    .padding(.horizontal, AppTheme.Spacing.sm)
-                    .padding(.vertical, AppTheme.Spacing.xs)
-                    .background(AppTheme.Colors.accent.opacity(0.1))
+                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .light))
+                    .tracking(0.5)
+                    .foregroundStyle(AppTheme.Colors.accent)
+                    .padding(.horizontal, AppTheme.Spacing.md)
+                    .padding(.vertical, 7)
+                    .background(AppTheme.Colors.accentLight)
                     .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(AppTheme.Colors.accentMid, lineWidth: 0.5)
+                    )
                 }
                 .buttonStyle(.plain)
             }

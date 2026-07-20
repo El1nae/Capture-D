@@ -11,8 +11,26 @@ struct OnboardingView: View {
             howToUsePage.tag(1)
             apiKeyPage.tag(2)
         }
-        .tabViewStyle(.page(indexDisplayMode: .always))
+        .tabViewStyle(.page(indexDisplayMode: .never))
         .ignoresSafeArea()
+        .overlay(alignment: .bottom) {
+            pageIndicator
+                .padding(.bottom, 30)
+        }
+    }
+
+    /// 自定义页码点 — 日系极简细胶囊
+    private var pageIndicator: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<3, id: \.self) { index in
+                Capsule()
+                    .fill(currentPage == index
+                          ? AppTheme.Colors.accent
+                          : AppTheme.Colors.tertiaryText.opacity(0.4))
+                    .frame(width: currentPage == index ? 18 : 6, height: 6)
+                    .animation(AppTheme.Animation.quick, value: currentPage)
+            }
+        }
     }
 
     /// 第 1 页：欢迎
@@ -21,14 +39,17 @@ struct OnboardingView: View {
             Spacer()
 
             Image(systemName: "photo.on.rectangle.angled")
-                .font(.system(size: 64))
+                .font(.system(size: 64, weight: .light))
                 .foregroundStyle(AppTheme.Colors.accent)
+                .opacity(0.7)
 
             Text("Capture:D")
-                .font(.system(size: AppTheme.FontSize.largeTitle, weight: .bold))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.largeTitle, weight: .light))
+                .tracking(1.5)
+                .foregroundStyle(AppTheme.Colors.primaryText)
 
             Text("你的第二个照片 App")
-                .font(.system(size: AppTheme.FontSize.title))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.title, weight: .light))
                 .foregroundStyle(AppTheme.Colors.secondaryText)
 
             VStack(spacing: AppTheme.Spacing.sm) {
@@ -36,8 +57,9 @@ struct OnboardingView: View {
                 Text("小说、诗词、画风、歌曲")
                 Text("一键归档，智能分类")
             }
-            .font(.system(size: AppTheme.FontSize.body))
+            .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
             .foregroundStyle(AppTheme.Colors.tertiaryText)
+            .lineSpacing(6)
 
             Spacer()
 
@@ -63,9 +85,10 @@ struct OnboardingView: View {
             .padding(.horizontal, AppTheme.Spacing.xl)
 
             Text("图片会保存在 app 里\n不占用相册空间")
-                .font(.system(size: AppTheme.FontSize.caption))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .light))
                 .foregroundStyle(AppTheme.Colors.tertiaryText)
                 .multilineTextAlignment(.center)
+                .lineSpacing(6)
 
             Spacer()
 
@@ -83,23 +106,27 @@ struct OnboardingView: View {
             Spacer()
 
             Image(systemName: "brain")
-                .font(.system(size: 48))
+                .font(.system(size: 48, weight: .light))
                 .foregroundStyle(AppTheme.Colors.accent)
+                .opacity(0.7)
 
             Text("AI 智能分析")
-                .font(.system(size: AppTheme.FontSize.title, weight: .medium))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.title, weight: .light))
+                .tracking(1.0)
+                .foregroundStyle(AppTheme.Colors.primaryText)
 
             VStack(spacing: AppTheme.Spacing.sm) {
                 Text("配置 API Key 后")
                 Text("AI 会自动识别图片出处")
                 Text("生成诗词全文、歌词、画风分析等")
             }
-            .font(.system(size: AppTheme.FontSize.body))
+            .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
             .foregroundStyle(AppTheme.Colors.secondaryText)
             .multilineTextAlignment(.center)
+            .lineSpacing(6)
 
             Text("可以稍后在设置中配置")
-                .font(.system(size: AppTheme.FontSize.caption))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .light))
                 .foregroundStyle(AppTheme.Colors.tertiaryText)
 
             Spacer()
@@ -119,18 +146,20 @@ struct OnboardingView: View {
         HStack(spacing: AppTheme.Spacing.md) {
             ZStack {
                 Circle()
-                    .fill(AppTheme.Colors.accent)
+                    .stroke(AppTheme.Colors.accent, lineWidth: 0.5)
                     .frame(width: 32, height: 32)
                 Text("\(number)")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(.white)
+                    .font(AppTheme.Fonts.sans(14, weight: .light))
+                    .foregroundStyle(AppTheme.Colors.accent)
             }
             Image(systemName: icon)
-                .font(.system(size: 20))
+                .font(.system(size: 18, weight: .light))
                 .foregroundStyle(AppTheme.Colors.accent)
+                .opacity(0.55)
                 .frame(width: 30)
             Text(text)
-                .font(.system(size: AppTheme.FontSize.body))
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
+                .foregroundStyle(AppTheme.Colors.primaryText)
         }
     }
 }

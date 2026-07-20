@@ -21,6 +21,9 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("智能识别")
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))
+                        .tracking(1.5)
+                        .textCase(.uppercase)
                 }
 
                 // MARK: - 预算管理
@@ -36,6 +39,9 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("费用")
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))
+                        .tracking(1.5)
+                        .textCase(.uppercase)
                 } footer: {
                     Text("本月已分析 \(ai.monthlyAnalysisCount) 次，预估 \(ai.estimatedCost)")
                         .font(.system(size: AppTheme.FontSize.footnote))
@@ -65,6 +71,9 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("存储")
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))
+                        .tracking(1.5)
+                        .textCase(.uppercase)
                 }
 
                 // MARK: - 隐私
@@ -80,6 +89,9 @@ struct SettingsView: View {
                     }
                 } header: {
                     Text("关于")
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))
+                        .tracking(1.5)
+                        .textCase(.uppercase)
                 }
             }
             .navigationTitle("设置")
@@ -100,20 +112,26 @@ private struct SettingsRow: View {
     var body: some View {
         HStack(spacing: AppTheme.Spacing.md) {
             Image(systemName: icon)
-                .font(.system(size: AppTheme.FontSize.headline))
-                .foregroundStyle(AppTheme.Colors.accent)
+                .font(.system(size: AppTheme.FontSize.headline, weight: .light))
+                .foregroundStyle(AppTheme.Colors.accent.opacity(0.55))
                 .frame(width: 28)
 
             VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                 Text(title)
-                    .font(.system(size: AppTheme.FontSize.body, weight: .medium))
+                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .regular))
                     .foregroundStyle(AppTheme.Colors.primaryText)
                 if let subtitle {
                     Text(subtitle)
-                        .font(.system(size: AppTheme.FontSize.caption))
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .light))
                         .foregroundStyle(AppTheme.Colors.secondaryText)
                 }
             }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: AppTheme.FontSize.caption, weight: .light))
+                .foregroundStyle(AppTheme.Colors.tertiaryText.opacity(0.4))
         }
         .padding(.vertical, AppTheme.Spacing.xs)
     }
