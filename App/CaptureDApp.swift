@@ -4,18 +4,10 @@ import SwiftData
 /// App 入口
 @main
 struct CaptureDApp: App {
-    @State private var databaseManager: DatabaseManager
-    @State private var storageManager: PhotoStorageManager
-    @State private var aiManager: AIManager
-
-    init() {
-        let db = try! DatabaseManager()
-        let storage = PhotoStorageManager()
-        let ai = AIManager()
-        _databaseManager = State(initialValue: db)
-        _storageManager = State(initialValue: storage)
-        _aiManager = State(initialValue: ai)
-    }
+    // Managers are @Observable classes, injected via .environment()
+    @State private var databaseManager = DatabaseManager()
+    @State private var storageManager = PhotoStorageManager()
+    @State private var aiManager = AIManager()
 
     var body: some Scene {
         WindowGroup {

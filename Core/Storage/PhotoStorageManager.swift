@@ -1,7 +1,9 @@
 import Foundation
 import UIKit
+import Observation
 
 /// 图片存储管理器 — 负责图片文件的读写、缩略图生成和空间计算
+@Observable
 final class PhotoStorageManager {
     private let fileManager = FileManager.default
 
@@ -33,6 +35,8 @@ final class PhotoStorageManager {
         }
         return url
     }
+    
+    init() {}
 
     // MARK: - 存取
 

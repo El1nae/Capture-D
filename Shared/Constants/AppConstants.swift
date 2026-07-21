@@ -2,7 +2,7 @@ import Foundation
 
 enum AppConstants {
     /// App Group ID — 主 App 和 Share Extension 共享数据
-    static let appGroupID = "group.com.yourname.captured"
+    static let appGroupID = "group.com.el1nA.CaptureD"
 
     /// 文件命名格式正则：匹配 `X|Y`（至少各一个字符）
     static let fileNamePattern = "^.+\\|.+$"

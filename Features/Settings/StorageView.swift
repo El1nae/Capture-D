@@ -54,3 +54,4 @@ struct StorageView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+

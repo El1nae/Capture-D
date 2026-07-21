@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Observation
 
 /// AI 错误类型
 enum AIError: LocalizedError {
@@ -58,22 +59,45 @@ final class AIManager {
     private let keychain = KeychainManager()
     private var isProcessing = false
 
+    init() {}
+
     /// 当前选择的 AI 平台
     var currentProvider: String {
-        get { UserDefaults.standard.string(forKey: "ai_provider") ?? "deepseek" }
-        set { UserDefaults.standard.set(newValue, forKey: "ai_provider") }
+        get {
+            access(keyPath: \.currentProvider)
+            return UserDefaults.standard.string(forKey: "ai_provider") ?? "deepseek"
+        }
+        set {
+            withMutation(keyPath: \.currentProvider) {
+                UserDefaults.standard.set(newValue, forKey: "ai_provider")
+            }
+        }
     }
 
     /// 本月已分析次数
     var monthlyAnalysisCount: Int {
-        get { UserDefaults.standard.integer(forKey: monthlyCountKey) }
-        set { UserDefaults.standard.set(newValue, forKey: monthlyCountKey) }
+        get {
+            access(keyPath: \.monthlyAnalysisCount)
+            return UserDefaults.standard.integer(forKey: monthlyCountKey)
+        }
+        set {
+            withMutation(keyPath: \.monthlyAnalysisCount) {
+                UserDefaults.standard.set(newValue, forKey: monthlyCountKey)
+            }
+        }
     }
 
     /// 月度分析上限（0 = 不限制）
     var monthlyLimit: Int {
-        get { UserDefaults.standard.integer(forKey: "ai_monthly_limit") }
-        set { UserDefaults.standard.set(newValue, forKey: "ai_monthly_limit") }
+        get {
+            access(keyPath: \.monthlyLimit)
+            return UserDefaults.standard.integer(forKey: "ai_monthly_limit")
+        }
+        set {
+            withMutation(keyPath: \.monthlyLimit) {
+                UserDefaults.standard.set(newValue, forKey: "ai_monthly_limit")
+            }
+        }
     }
 
     /// 是否正在分析中

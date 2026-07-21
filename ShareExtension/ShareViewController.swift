@@ -6,7 +6,7 @@ class ShareViewController: UIViewController {
     private var imageData: Data?
     private var selectedCategories: Set<String> = []
     private let storageURL: URL = {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.yourname.captured")!
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.el1nA.CaptureD")!
             .appendingPathComponent("Pending", isDirectory: true)
     }()
 

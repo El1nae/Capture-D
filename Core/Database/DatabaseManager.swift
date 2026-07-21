@@ -1,20 +1,24 @@
 import Foundation
 import SwiftData
+import Observation
 
 /// 数据库管理器 — 所有数据的 CRUD 操作
 @MainActor
+@Observable
 final class DatabaseManager {
     let modelContainer: ModelContainer
     let modelContext: ModelContext
 
-    init() throws {
+    init() {
+        // It is acceptable to crash early during development if the persistent container cannot be created.
+        // In production, consider handling this error more gracefully.
         let schema = Schema([CollectionFile.self, ImageRecord.self, ContentBlock.self])
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
             groupContainer: .identifier(AppConstants.appGroupID)
         )
-        modelContainer = try ModelContainer(for: schema, configurations: [config])
+        modelContainer = try! ModelContainer(for: schema, configurations: [config])
         modelContext = modelContainer.mainContext
     }
 
@@ -277,3 +281,4 @@ final class DatabaseManager {
         return (try? modelContext.fetch(descriptor)) ?? []
     }
 }
+

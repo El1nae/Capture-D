@@ -149,3 +149,4 @@ struct CollectionView: View {
         .waterfallCardStyle()
     }
 }
+
