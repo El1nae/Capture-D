@@ -6,13 +6,22 @@ struct FileDetailView: View {
     @Environment(DatabaseManager.self) private var database
     @Environment(PhotoStorageManager.self) private var storage
     @State private var showImageGallery = false
-    @State private var editingText = ""
     @State private var isEditing = false
+    @State private var isEditingTags = false
+    @State private var editableTags: [String] = []
 
     var body: some View {
         ZStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
+                    // 标签区域
+                    if !file.tags.isEmpty || isEditingTags {
+                        tagSection
+                            .padding(.horizontal, AppTheme.Spacing.md)
+                            .padding(.top, AppTheme.Spacing.sm)
+                            .padding(.bottom, AppTheme.Spacing.sm)
+                    }
+
                     // 时间线式内容块
                     ForEach(sortedBlocks, id: \.createdAt) { block in
                         TimelineSeparator(date: block.createdAt)
@@ -54,8 +63,18 @@ struct FileDetailView: View {
                     .lineLimit(1)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: { isEditing.toggle() }) {
-                    Text(isEditing ? "完成" : "编辑")
+                Menu {
+                    Button(action: { isEditing = true }) {
+                        Label("编辑内容", systemImage: "square.and.pencil")
+                    }
+                    Button(action: {
+                        editableTags = file.tags
+                        isEditingTags.toggle()
+                    }) {
+                        Label(isEditingTags ? "完成标签编辑" : "编辑标签", systemImage: "tag")
+                    }
+                } label: {
+                    Text("编辑")
                         .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                         .tracking(0.5)
                         .foregroundStyle(AppTheme.Colors.accent)
@@ -73,7 +92,36 @@ struct FileDetailView: View {
                 }
         )
         .sheet(isPresented: $isEditing) {
-            editSheet
+            ComposeSheet(
+                placeholder: "补充内容...",
+                navTitle: "编辑内容",
+                initialText: sortedBlocks.map(\.text).joined(separator: "\n\n")
+            ) { text in
+                saveEdits(text)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var tagSection: some View {
+        if isEditingTags {
+            TagInputView(
+                tags: $editableTags,
+                allHistoryTags: database.allTags()
+            )
+            .onChange(of: editableTags) { _, newTags in
+                // 实时同步到数据库
+                let current = Set(file.tags)
+                let updated = Set(newTags)
+                for tag in updated.subtracting(current) {
+                    database.addTag(tag, to: file)
+                }
+                for tag in current.subtracting(updated) {
+                    database.removeTag(tag, from: file)
+                }
+            }
+        } else {
+            TagFlowView(tags: file.tags)
         }
     }
 
@@ -81,33 +129,8 @@ struct FileDetailView: View {
         file.contentBlocks.sorted { $0.createdAt < $1.createdAt }
     }
 
-    /// 编辑模式 — 模仿备忘录
-    private var editSheet: some View {
-        NavigationStack {
-            TextEditor(text: $editingText)
-                .font(.system(size: AppTheme.FontSize.body))
-                .padding(AppTheme.Spacing.md)
-                .onAppear {
-                    editingText = sortedBlocks.map(\.text).joined(separator: "\n\n")
-                }
-                .navigationTitle("编辑内容")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("取消") { isEditing = false }
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("保存") {
-                            saveEdits()
-                            isEditing = false
-                        }
-                    }
-                }
-        }
-    }
-
-    private func saveEdits() {
-        let block = ContentBlock(text: editingText, isAIGenerated: false, file: file)
+    private func saveEdits(_ text: String) {
+        let block = ContentBlock(text: text, isAIGenerated: false, file: file)
         file.contentBlocks.append(block)
         file.updatedAt = Date()
     }

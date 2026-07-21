@@ -30,6 +30,8 @@ final class CollectionFile {
     var categoryRawValue: String
     /// 文件状态
     var statusRawValue: String
+    /// 用户自定义标签
+    var tags: [String]
     /// 创建时间
     var createdAt: Date
     /// 最后更新时间
@@ -42,7 +44,7 @@ final class CollectionFile {
     @Relationship(deleteRule: .cascade) var contentBlocks: [ContentBlock]
 
     var category: CategoryType {
-        get { CategoryType(rawValue: categoryRawValue) ?? .novel }
+        get { CategoryType(rawValue: categoryRawValue) ?? .literature }
         set { categoryRawValue = newValue.rawValue }
     }
 
@@ -55,6 +57,7 @@ final class CollectionFile {
         self.title = title
         self.categoryRawValue = category.rawValue
         self.statusRawValue = status.rawValue
+        self.tags = []
         self.createdAt = Date()
         self.updatedAt = Date()
         self.images = []

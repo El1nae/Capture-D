@@ -54,7 +54,7 @@ struct OnboardingView: View {
 
             VStack(spacing: AppTheme.Spacing.sm) {
                 Text("收藏截图，AI 自动整理")
-                Text("小说、诗词、画风、歌曲")
+                Text("找书、找诗、找画、找歌")
                 Text("一键归档，智能分类")
             }
             .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
@@ -118,7 +118,7 @@ struct OnboardingView: View {
             VStack(spacing: AppTheme.Spacing.sm) {
                 Text("配置 API Key 后")
                 Text("AI 会自动识别图片出处")
-                Text("生成诗词全文、歌词、画风分析等")
+                Text("生成找诗全文、歌词、找画分析等")
             }
             .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
             .foregroundStyle(AppTheme.Colors.secondaryText)

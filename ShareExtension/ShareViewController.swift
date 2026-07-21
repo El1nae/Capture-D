@@ -14,10 +14,10 @@ class ShareViewController: UIViewController {
     private let accentColor = UIColor(red: 0.49, green: 0.569, blue: 0.447, alpha: 1)      // #7D9172 鼠尾草绿
     private let tertiaryTextColor = UIColor(red: 0.722, green: 0.718, blue: 0.69, alpha: 1) // #B8B7B0
 
-    /// 系统衬线字体
+    /// 系统圆体字体
     private func serifFont(ofSize size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
         let base = UIFont.systemFont(ofSize: size, weight: weight)
-        if let descriptor = base.fontDescriptor.withDesign(.serif) {
+        if let descriptor = base.fontDescriptor.withDesign(.rounded) {
             return UIFont(descriptor: descriptor, size: size)
         }
         return base
@@ -42,7 +42,7 @@ class ShareViewController: UIViewController {
         stackView.distribution = .fillEqually
         stackView.spacing = 8
 
-        let categories = ["小说", "诗词", "画风", "歌曲"]
+        let categories = ["找书", "找诗", "找画", "找歌"]
         for name in categories {
             let button = UIButton(type: .system)
             button.setTitle(name, for: .normal)

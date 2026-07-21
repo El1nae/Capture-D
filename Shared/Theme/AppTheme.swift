@@ -61,13 +61,13 @@ enum AppTheme {
         static let quick = SwiftUI.Animation.spring(response: 0.35, dampingFraction: 0.8)
     }
 
-    // MARK: - 字体
+    // MARK: - 字体（圆体）
     enum Fonts {
         static func serif(_ size: CGFloat, weight: Font.Weight = .light) -> Font {
-            .system(size: size, weight: weight, design: .serif)
+            .system(size: size, weight: weight, design: .rounded)
         }
         static func sans(_ size: CGFloat, weight: Font.Weight = .light) -> Font {
-            .system(size: size, weight: weight, design: .default)
+            .system(size: size, weight: weight, design: .rounded)
         }
     }
 }

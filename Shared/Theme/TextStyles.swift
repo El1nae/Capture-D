@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 文字样式 — 日系极简：宋体标题 + 细黑体正文
+/// 文字样式 — 日系极简：圆体
 enum TextStyles {
     /// AI 生成的注释 — 淡灰小字
     struct AIAnnotation: ViewModifier {

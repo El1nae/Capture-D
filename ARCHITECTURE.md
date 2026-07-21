@@ -149,7 +149,7 @@ Features/RecycleBin ──→ Core/Database
 
 ```
 Category（分类）
-├── name: String          // 小说/诗词/画风/歌曲
+├── name: String          // 找书/找诗/找画/找歌
 └── files: [CollectionFile]
 
 CollectionFile（收藏文件）

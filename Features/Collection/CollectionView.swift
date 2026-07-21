@@ -6,46 +6,67 @@ struct CollectionView: View {
     @Environment(PhotoStorageManager.self) private var storage
     @State private var selectedCategory: CategoryType?
     @State private var showSearch = false
+    @State private var showSidebar = false
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                CategoryFilterBar(selectedCategory: $selectedCategory)
+        ZStack {
+            NavigationStack {
+                VStack(spacing: 0) {
+                    CategoryFilterBar(selectedCategory: $selectedCategory)
 
-                if let category = selectedCategory {
-                    filteredCategoryView(category)
-                } else {
-                    allFilesView
-                }
-            }
-            .navigationTitle("Capture:D")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Capture:D")
-                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.headline, weight: .light))
-                        .tracking(1.0)
-                        .foregroundStyle(AppTheme.Colors.primaryText)
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { showSearch = true }) {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: AppTheme.FontSize.headline, weight: .light))
-                            .foregroundStyle(AppTheme.Colors.accent)
-                            .opacity(0.7)
+                    if let category = selectedCategory {
+                        if category == .murmur {
+                            MurmurTimelineView()
+                        } else {
+                            filteredCategoryView(category)
+                        }
+                    } else {
+                        allFilesView
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(destination: SettingsView()) {
-                        Image(systemName: "gearshape")
-                            .font(.system(size: AppTheme.FontSize.headline, weight: .light))
-                            .foregroundStyle(AppTheme.Colors.accent)
-                            .opacity(0.7)
+                .navigationTitle("Capture:D")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button(action: { withAnimation { showSidebar = true } }) {
+                            Image(systemName: "line.3.horizontal")
+                                .font(.system(size: AppTheme.FontSize.headline, weight: .light))
+                                .foregroundStyle(AppTheme.Colors.accent)
+                                .opacity(0.7)
+                        }
+                    }
+                    ToolbarItem(placement: .principal) {
+                        Text("Capture:D")
+                            .font(AppTheme.Fonts.serif(AppTheme.FontSize.headline, weight: .light))
+                            .tracking(1.0)
+                            .foregroundStyle(AppTheme.Colors.primaryText)
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(action: { showSearch = true }) {
+                            Image(systemName: "magnifyingglass")
+                                .font(.system(size: AppTheme.FontSize.headline, weight: .light))
+                                .foregroundStyle(AppTheme.Colors.accent)
+                                .opacity(0.7)
+                        }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink(destination: SettingsView()) {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: AppTheme.FontSize.headline, weight: .light))
+                                .foregroundStyle(AppTheme.Colors.accent)
+                                .opacity(0.7)
+                        }
                     }
                 }
+                .sheet(isPresented: $showSearch) {
+                    SearchView()
+                }
             }
-            .sheet(isPresented: $showSearch) {
-                SearchView()
+
+            if showSidebar {
+                SidebarView(isPresented: $showSidebar)
+                    .ignoresSafeArea()
+                    .zIndex(10)
             }
         }
     }
@@ -107,6 +128,11 @@ struct CollectionView: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
+                if !file.tags.isEmpty {
+                    TagFlowView(tags: file.tags, limit: 2)
+                        .padding(.bottom, 2)
+                }
+
                 Text(file.title)
                     .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .regular))
                     .foregroundStyle(AppTheme.Colors.primaryText)

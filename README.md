@@ -72,7 +72,7 @@ App 入口和生命周期管理。
 | AI/ | DeepSeekService.swift | DeepSeek API 适配器 |
 | AI/ | DoubaoService.swift | 豆包 API 适配器 |
 | AI/ | AIManager.swift | AI 调用管理、队列化、费用计数、平台切换 |
-| AI/Prompts/ | PromptTemplates.swift | 各分类（小说/诗词/画风/歌曲）的 AI 提示词模板 |
+| AI/Prompts/ | PromptTemplates.swift | 各分类（找书/找诗/找画/找歌）的 AI 提示词模板 |
 | Database/ | Models.swift | SwiftData 数据模型（CollectionFile、ImageRecord、ContentBlock） |
 | Database/ | DatabaseManager.swift | 数据库 CRUD 操作、文件合并、回收站管理 |
 | Storage/ | PhotoStorageManager.swift | 图片文件读写、缩略图生成、空间计算 |
@@ -118,7 +118,7 @@ App 入口和生命周期管理。
 | Components/ | WaterfallGrid.swift | 双列瀑布流布局组件 |
 | Components/ | EmptyStateView.swift | 首页空白引导提示 |
 | Extensions/ | DateExtensions.swift | 日期格式化扩展 |
-| Models/ | CategoryType.swift | 四大分类枚举定义（小说/诗词/画风/歌曲） |
+| Models/ | CategoryType.swift | 四大分类枚举定义（找书/找诗/找画/找歌） |
 | Models/ | FileStatus.swift | 文件状态枚举（已整理/未整理/已删除） |
 | Constants/ | AppConstants.swift | App Group ID、文件名正则、回收站天数等全局常量 |
 

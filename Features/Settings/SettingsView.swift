@@ -69,6 +69,15 @@ struct SettingsView: View {
                             subtitle: "已删除文件保留 \(AppConstants.recycleBinRetentionDays) 天"
                         )
                     }
+                    NavigationLink {
+                        ExportView()
+                    } label: {
+                        SettingsRow(
+                            icon: "square.and.arrow.up",
+                            title: "导出备份",
+                            subtitle: "ZIP 完整备份"
+                        )
+                    }
                 } header: {
                     Text("存储")
                         .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .regular))

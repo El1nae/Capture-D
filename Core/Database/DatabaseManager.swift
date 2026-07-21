@@ -195,11 +195,14 @@ final class DatabaseManager {
 
     // MARK: - 搜索
 
-    /// 全局搜索（只搜已整理文件）
+    /// 全局搜索（搜标题和标签，只搜已整理文件）
     func search(query: String) -> [CollectionFile] {
         let status = FileStatus.sorted.rawValue
         let predicate = #Predicate<CollectionFile> {
-            $0.statusRawValue == status && $0.title.localizedStandardContains(query)
+            $0.statusRawValue == status && (
+                $0.title.localizedStandardContains(query) ||
+                $0.tags.contains(where: { $0.localizedStandardContains(query) })
+            )
         }
         let descriptor = FetchDescriptor<CollectionFile>(
             predicate: predicate,
@@ -208,10 +211,69 @@ final class DatabaseManager {
         return (try? modelContext.fetch(descriptor)) ?? []
     }
 
+    // MARK: - 标签
+
+    /// 给文件添加标签
+    func addTag(_ tag: String, to file: CollectionFile) {
+        let trimmed = tag.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty, !file.tags.contains(trimmed) else { return }
+        file.tags.append(trimmed)
+        file.updatedAt = Date()
+        try? modelContext.save()
+    }
+
+    /// 从文件移除标签
+    func removeTag(_ tag: String, from file: CollectionFile) {
+        file.tags.removeAll { $0 == tag }
+        file.updatedAt = Date()
+        try? modelContext.save()
+    }
+
+    /// 获取所有历史标签（去重，按使用频率排序）
+    func allTags() -> [String] {
+        let status = FileStatus.sorted.rawValue
+        let predicate = #Predicate<CollectionFile> { $0.statusRawValue == status }
+        let descriptor = FetchDescriptor<CollectionFile>(predicate: predicate)
+        let files = (try? modelContext.fetch(descriptor)) ?? []
+        var counts: [String: Int] = [:]
+        for file in files {
+            for tag in file.tags { counts[tag, default: 0] += 1 }
+        }
+        return counts.sorted { $0.value > $1.value }.map(\.key)
+    }
+
     // MARK: - 跨分类
 
     /// 查找同一张图片在其他分类中的文件
     func crossCategoryFiles(for image: ImageRecord, excluding file: CollectionFile) -> [CollectionFile] {
         image.files.filter { $0.persistentModelID != file.persistentModelID }
+    }
+
+    // MARK: - 碎碎念
+
+    /// 创建碎碎念（直接为 sorted 状态，跳过 unsorted 流程）
+    func createMurmur(text: String, tags: [String] = []) -> CollectionFile {
+        let file = CollectionFile(title: Date().unsortedFileName, category: .murmur, status: .sorted)
+        file.tags = tags
+        let block = ContentBlock(text: text, isAIGenerated: false, file: file)
+        modelContext.insert(file)
+        modelContext.insert(block)
+        file.contentBlocks.append(block)
+        try? modelContext.save()
+        return file
+    }
+
+    /// 获取所有碎碎念（按创建时间倒序）
+    func murmurFiles() -> [CollectionFile] {
+        let raw = CategoryType.murmur.rawValue
+        let status = FileStatus.sorted.rawValue
+        let predicate = #Predicate<CollectionFile> {
+            $0.categoryRawValue == raw && $0.statusRawValue == status
+        }
+        let descriptor = FetchDescriptor<CollectionFile>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
     }
 }
