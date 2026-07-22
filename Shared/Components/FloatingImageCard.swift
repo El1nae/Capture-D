@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 浮层图片卡片 — 比屏幕小一圈，轻盈灵动
+/// 浮层图片卡片 — 图片撑满，日期左对齐悬浮
 struct FloatingImageCard: View {
     let imageData: Data
     let capturedAt: Date
@@ -20,13 +20,8 @@ struct FloatingImageCard: View {
     }
 
     var body: some View {
-        VStack(spacing: AppTheme.Spacing.xs) {
-            Text(capturedAt.formatted(date: .abbreviated, time: .shortened))
-                .font(AppTheme.Fonts.serif(AppTheme.FontSize.footnote, weight: .light))
-                .tracking(0.6)
-                .foregroundStyle(AppTheme.Colors.tertiaryText)
-
-            if let uiImage = UIImage(data: imageData) {
+        if let uiImage = UIImage(data: imageData) {
+            ZStack(alignment: .bottomLeading) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
@@ -36,12 +31,18 @@ struct FloatingImageCard: View {
                             .stroke(showGoldGlow ? AppTheme.Colors.goldGlow : .clear, lineWidth: 2)
                     )
                     .shadow(color: showGoldGlow ? AppTheme.Colors.goldGlow.opacity(0.25) : .clear, radius: 6)
-                    .padding(.horizontal, AppTheme.Spacing.lg)
                     .onLongPressGesture {
                         let generator = UIImpactFeedbackGenerator(style: .medium)
                         generator.impactOccurred()
                         onLongPress?()
                     }
+
+                Text(capturedAt.formatted(date: .abbreviated, time: .shortened))
+                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.footnote, weight: .light))
+                    .tracking(0.6)
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
+                    .padding(AppTheme.Spacing.sm)
             }
         }
     }

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 碎碎念时间线 — Threads 式单列布局
+/// 碎碎念时间线 — Threads 式紧凑单列布局
 struct MurmurTimelineView: View {
     @Environment(DatabaseManager.self) private var database
 
@@ -18,7 +18,7 @@ struct MurmurTimelineView: View {
                         TimelineSeparator(date: file.createdAt)
                         MurmurCard(file: file)
                         Divider()
-                            .foregroundStyle(AppTheme.Colors.separator)
+                            .padding(.leading, AppTheme.Spacing.md)
                     }
                 }
                 .padding(.bottom, 80)

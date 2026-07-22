@@ -33,13 +33,21 @@ struct CaptureDApp: App {
             let imageID = storageManager.saveImage(imageData)
             let imageRecord = ImageRecord(imageID: imageID, capturedAt: item.savedAt)
 
+            let hasValidName = !item.name.isEmpty && AppConstants.isValidFileName(item.name)
+            let title = hasValidName ? item.name : item.savedAt.unsortedFileName
+            let status: FileStatus = hasValidName ? .sorted : .unsorted
+
             for categoryName in item.categories {
                 guard let category = CategoryType(rawValue: categoryName) else { continue }
-                _ = databaseManager.createUnsortedFile(
-                    title: item.savedAt.unsortedFileName,
+                let file = databaseManager.createUnsortedFile(
+                    title: title,
                     category: category,
                     imageRecord: imageRecord
                 )
+                file.tags = item.tags
+                if hasValidName {
+                    file.status = .sorted
+                }
             }
 
             storageManager.removePendingImageFile(fileName: item.imageFileName)

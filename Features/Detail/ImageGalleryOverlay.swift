@@ -21,19 +21,15 @@ struct ImageGalleryOverlay: View {
                     }
                 }
 
-            VStack {
-                TabView(selection: $currentPage) {
-                    ForEach(Array(file.images.enumerated()), id: \.element.imageID) { index, image in
-                        imageCard(image: image)
-                            .tag(index)
-                    }
+            TabView(selection: $currentPage) {
+                ForEach(Array(file.images.enumerated()), id: \.element.imageID) { index, image in
+                    imageCard(image: image)
+                        .tag(index)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .frame(height: UIScreen.main.bounds.height * 0.6)
-                .padding(.horizontal, AppTheme.Spacing.lg)
             }
+            .tabViewStyle(.page(indexDisplayMode: .always))
+            .frame(maxHeight: .infinity)
 
-            // 跨分类 tag 弹出
             if showCrossTags, let image = selectedImage {
                 crossCategoryTags(for: image)
             }
@@ -53,7 +49,8 @@ struct ImageGalleryOverlay: View {
     private func imageCard(image: ImageRecord) -> some View {
         let hasCrossRef = database.crossCategoryFiles(for: image, excluding: file).count > 0
 
-        return VStack(spacing: AppTheme.Spacing.xs) {
+        return VStack {
+            Spacer()
             if let data = storage.loadImage(id: image.imageID) {
                 FloatingImageCard(
                     imageData: data,
@@ -70,8 +67,9 @@ struct ImageGalleryOverlay: View {
                     }
                 )
             }
+            Spacer()
         }
-        .floatingCardStyle()
+        .padding(.horizontal, AppTheme.Spacing.xs)
     }
 
     private func crossCategoryTags(for image: ImageRecord) -> some View {

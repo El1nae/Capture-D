@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 单条碎碎念卡片 — 纯文字 + tags + 时间
+/// 单条碎碎念卡片 — Threads 风格紧凑布局
 struct MurmurCard: View {
     let file: CollectionFile
 
@@ -12,7 +12,7 @@ struct MurmurCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: 4) {
             if !file.tags.isEmpty {
                 TagFlowView(tags: file.tags)
             }
@@ -20,10 +20,10 @@ struct MurmurCard: View {
             Text(displayText)
                 .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                 .foregroundStyle(AppTheme.Colors.primaryText)
-                .lineSpacing(6)
+                .lineSpacing(4)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(AppTheme.Spacing.md)
-        .background(AppTheme.Colors.background)
+        .padding(.horizontal, AppTheme.Spacing.md)
+        .padding(.vertical, AppTheme.Spacing.sm)
     }
 }

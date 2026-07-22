@@ -1,20 +1,20 @@
 import SwiftUI
 
-/// 文件详情页 — 纯文字内容 + 左滑图片浮层
+/// 文件详情页 — 时间线内容 + 逐条编辑 + 追加 + 左滑图片浮层
 struct FileDetailView: View {
     let file: CollectionFile
     @Environment(DatabaseManager.self) private var database
     @Environment(PhotoStorageManager.self) private var storage
     @State private var showImageGallery = false
-    @State private var isEditing = false
     @State private var isEditingTags = false
     @State private var editableTags: [String] = []
+    @State private var editingBlock: ContentBlock?
+    @State private var showAppendSheet = false
 
     var body: some View {
         ZStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    // 标签区域
                     if !file.tags.isEmpty || isEditingTags {
                         tagSection
                             .padding(.horizontal, AppTheme.Spacing.md)
@@ -22,14 +22,24 @@ struct FileDetailView: View {
                             .padding(.bottom, AppTheme.Spacing.sm)
                     }
 
-                    // 时间线式内容块
                     ForEach(sortedBlocks, id: \.createdAt) { block in
                         TimelineSeparator(date: block.createdAt)
 
-                        Text(block.text)
-                            .bodyTextStyle()
-                            .padding(.horizontal, AppTheme.Spacing.md)
-                            .padding(.bottom, AppTheme.Spacing.md)
+                        HStack(alignment: .top, spacing: 4) {
+                            Text(block.text)
+                                .bodyTextStyle()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Button(action: { editingBlock = block }) {
+                                Image(systemName: "pencil")
+                                    .font(.system(size: 13, weight: .light))
+                                    .foregroundStyle(AppTheme.Colors.tertiaryText)
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.top, 2)
+                        }
+                        .padding(.horizontal, AppTheme.Spacing.md)
+                        .padding(.bottom, AppTheme.Spacing.sm)
                     }
 
                     if sortedBlocks.isEmpty {
@@ -39,11 +49,32 @@ struct FileDetailView: View {
                             .foregroundStyle(AppTheme.Colors.tertiaryText)
                             .padding(AppTheme.Spacing.md)
                     }
+
+                    HStack {
+                        Spacer()
+                        Button(action: { showAppendSheet = true }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 12, weight: .medium))
+                                Text("追加")
+                                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.caption, weight: .regular))
+                            }
+                            .foregroundStyle(AppTheme.Colors.accent)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .overlay(
+                                Capsule()
+                                    .stroke(AppTheme.Colors.accent.opacity(0.4), lineWidth: 0.5)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, AppTheme.Spacing.md)
+                    .padding(.top, AppTheme.Spacing.xs)
+                    .padding(.bottom, AppTheme.Spacing.xl)
                 }
-                .padding(.bottom, AppTheme.Spacing.xl)
             }
 
-            // 左滑图片浮层
             if showImageGallery {
                 ImageGalleryOverlay(
                     file: file,
@@ -63,18 +94,11 @@ struct FileDetailView: View {
                     .lineLimit(1)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Button(action: { isEditing = true }) {
-                        Label("编辑内容", systemImage: "square.and.pencil")
-                    }
-                    Button(action: {
-                        editableTags = file.tags
-                        isEditingTags.toggle()
-                    }) {
-                        Label(isEditingTags ? "完成标签编辑" : "编辑标签", systemImage: "tag")
-                    }
-                } label: {
-                    Text("编辑")
+                Button(action: {
+                    editableTags = file.tags
+                    isEditingTags.toggle()
+                }) {
+                    Text(isEditingTags ? "完成" : "编辑")
                         .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
                         .tracking(0.5)
                         .foregroundStyle(AppTheme.Colors.accent)
@@ -91,13 +115,21 @@ struct FileDetailView: View {
                     }
                 }
         )
-        .sheet(isPresented: $isEditing) {
+        .sheet(item: $editingBlock) { block in
+            ComposeSheet(
+                placeholder: "编辑内容...",
+                navTitle: "编辑",
+                initialText: block.text
+            ) { text in
+                database.updateContentBlock(block, newText: text)
+            }
+        }
+        .sheet(isPresented: $showAppendSheet) {
             ComposeSheet(
                 placeholder: "补充内容...",
-                navTitle: "编辑内容",
-                initialText: sortedBlocks.map(\.text).joined(separator: "\n\n")
+                navTitle: "追加内容"
             ) { text in
-                saveEdits(text)
+                database.appendContentBlock(to: file, text: text)
             }
         }
     }
@@ -110,7 +142,6 @@ struct FileDetailView: View {
                 allHistoryTags: database.allTags()
             )
             .onChange(of: editableTags) { _, newTags in
-                // 实时同步到数据库
                 let current = Set(file.tags)
                 let updated = Set(newTags)
                 for tag in updated.subtracting(current) {
@@ -127,11 +158,5 @@ struct FileDetailView: View {
 
     private var sortedBlocks: [ContentBlock] {
         file.contentBlocks.sorted { $0.createdAt < $1.createdAt }
-    }
-
-    private func saveEdits(_ text: String) {
-        let block = ContentBlock(text: text, isAIGenerated: false, file: file)
-        file.contentBlocks.append(block)
-        file.updatedAt = Date()
     }
 }

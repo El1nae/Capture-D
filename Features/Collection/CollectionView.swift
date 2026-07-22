@@ -1,28 +1,25 @@
 import SwiftUI
 
-/// 首页 — 双列瀑布流 + 分类筛选 tab
+/// 首页 — 双列瀑布流 + 分类筛选 tab + 内嵌搜索
 struct CollectionView: View {
     @Environment(DatabaseManager.self) private var database
     @Environment(PhotoStorageManager.self) private var storage
     @State private var selectedCategory: CategoryType?
-    @State private var showSearch = false
     @State private var showSidebar = false
+    @State private var searchQuery = ""
+    @State private var isSearching = false
 
     var body: some View {
         ZStack {
             NavigationStack {
                 VStack(spacing: 0) {
+                    if isSearching {
+                        searchBar
+                    }
+
                     CategoryFilterBar(selectedCategory: $selectedCategory)
 
-                    if let category = selectedCategory {
-                        if category == .murmur {
-                            MurmurTimelineView()
-                        } else {
-                            filteredCategoryView(category)
-                        }
-                    } else {
-                        allFilesView
-                    }
+                    contentArea
                 }
                 .navigationTitle("Capture:D")
                 .navigationBarTitleDisplayMode(.inline)
@@ -36,14 +33,28 @@ struct CollectionView: View {
                         }
                     }
                     ToolbarItem(placement: .principal) {
-                        Text("Capture:D")
-                            .font(AppTheme.Fonts.serif(AppTheme.FontSize.headline, weight: .light))
-                            .tracking(1.0)
-                            .foregroundStyle(AppTheme.Colors.primaryText)
+                        Button(action: {
+                            withAnimation(AppTheme.Animation.standard) {
+                                selectedCategory = nil
+                                searchQuery = ""
+                                isSearching = false
+                            }
+                        }) {
+                            Text("Capture:D")
+                                .font(AppTheme.Fonts.serif(AppTheme.FontSize.headline, weight: .light))
+                                .tracking(1.0)
+                                .foregroundStyle(AppTheme.Colors.primaryText)
+                        }
+                        .buttonStyle(.plain)
                     }
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button(action: { showSearch = true }) {
-                            Image(systemName: "magnifyingglass")
+                        Button(action: {
+                            withAnimation(AppTheme.Animation.standard) {
+                                isSearching.toggle()
+                                if !isSearching { searchQuery = "" }
+                            }
+                        }) {
+                            Image(systemName: isSearching ? "xmark" : "magnifyingglass")
                                 .font(.system(size: AppTheme.FontSize.headline, weight: .light))
                                 .foregroundStyle(AppTheme.Colors.accent)
                                 .opacity(0.7)
@@ -58,9 +69,6 @@ struct CollectionView: View {
                         }
                     }
                 }
-                .sheet(isPresented: $showSearch) {
-                    SearchView()
-                }
             }
 
             if showSidebar {
@@ -71,7 +79,62 @@ struct CollectionView: View {
         }
     }
 
-    /// 混合所有分类的瀑布流
+    private var searchBar: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 14, weight: .light))
+                .foregroundStyle(AppTheme.Colors.tertiaryText)
+
+            TextField("搜索文件名或标签", text: $searchQuery)
+                .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
+                .textFieldStyle(.plain)
+        }
+        .padding(.horizontal, AppTheme.Spacing.md)
+        .padding(.vertical, AppTheme.Spacing.sm)
+        .background(AppTheme.Colors.cardBackground)
+        .transition(.move(edge: .top).combined(with: .opacity))
+    }
+
+    @ViewBuilder
+    private var contentArea: some View {
+        let hasSearch = !searchQuery.trimmingCharacters(in: .whitespaces).isEmpty
+
+        if let category = selectedCategory {
+            if category == .murmur && !hasSearch {
+                MurmurTimelineView()
+            } else if hasSearch {
+                let files = database.search(query: searchQuery, category: category)
+                filteredResultView(files)
+            } else {
+                filteredCategoryView(category)
+            }
+        } else if hasSearch {
+            let files = database.search(query: searchQuery)
+            filteredResultView(files)
+        } else {
+            allFilesView
+        }
+    }
+
+    private func filteredResultView(_ files: [CollectionFile]) -> some View {
+        Group {
+            if files.isEmpty {
+                VStack(spacing: AppTheme.Spacing.md) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 36, weight: .thin))
+                        .foregroundStyle(AppTheme.Colors.tertiaryText)
+                        .opacity(0.35)
+                    Text("没有找到相关内容")
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
+                        .foregroundStyle(AppTheme.Colors.secondaryText)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                fileGrid(files)
+            }
+        }
+    }
+
     private var allFilesView: some View {
         let files = database.allSortedFiles()
         return Group {
@@ -84,7 +147,6 @@ struct CollectionView: View {
         }
     }
 
-    /// 某个分类下的瀑布流 + 未整理白条
     private func filteredCategoryView(_ category: CategoryType) -> some View {
         let files = database.sortedFiles(for: category)
         let unsortedCount = database.unsortedCount(for: category)
@@ -149,4 +211,3 @@ struct CollectionView: View {
         .waterfallCardStyle()
     }
 }
-

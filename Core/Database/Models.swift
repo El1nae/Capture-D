@@ -67,7 +67,7 @@ final class CollectionFile {
 
 /// 内容块 — 文件内的一段内容（AI 生成或用户编辑），按时间线排列
 @Model
-final class ContentBlock {
+final class ContentBlock: Identifiable {
     /// 文本内容
     var text: String
     /// 是否为 AI 生成
@@ -90,4 +90,6 @@ struct PendingImage: Codable {
     let imageFileName: String
     let categories: [String]
     let savedAt: Date
+    let name: String
+    let tags: [String]
 }

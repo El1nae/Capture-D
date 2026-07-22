@@ -55,7 +55,6 @@
 		CCDE5D47300F78BF00D916E1 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDE5CEA300F78BF00D916E1 /* OnboardingView.swift */; };
 		CCDE5D48300F78BF00D916E1 /* CardStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDE5D13300F78BF00D916E1 /* CardStyles.swift */; };
 		CCDE5D49300F78BF00D916E1 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDE5CD9300F78BF00D916E1 /* KeychainManager.swift */; };
-		CCDE5D4A300F78BF00D916E1 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDE5CEE300F78BF00D916E1 /* SearchView.swift */; };
 		CCDE5D4B300F78BF00D916E1 /* UnsortedBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDE5CE2300F78BF00D916E1 /* UnsortedBanner.swift */; };
 		CCDE5D4C300F78BF00D916E1 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDE5D11300F78BF00D916E1 /* AppTheme.swift */; };
 		CCDE5D4D300F78BF00D916E1 /* TextStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDE5D14300F78BF00D916E1 /* TextStyles.swift */; };
@@ -117,7 +116,6 @@
 		CCDE5CE8300F78BF00D916E1 /* MurmurTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MurmurTimelineView.swift; sourceTree = "<group>"; };
 		CCDE5CEA300F78BF00D916E1 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		CCDE5CEC300F78BF00D916E1 /* RecycleBinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecycleBinView.swift; sourceTree = "<group>"; };
-		CCDE5CEE300F78BF00D916E1 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		CCDE5CF0300F78BF00D916E1 /* AIConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIConfigView.swift; sourceTree = "<group>"; };
 		CCDE5CF1300F78BF00D916E1 /* APIKeyGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeyGuideView.swift; sourceTree = "<group>"; };
 		CCDE5CF2300F78BF00D916E1 /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
@@ -356,14 +354,6 @@
 			path = RecycleBin;
 			sourceTree = "<group>";
 		};
-		CCDE5CEF300F78BF00D916E1 /* Search */ = {
-			isa = PBXGroup;
-			children = (
-				CCDE5CEE300F78BF00D916E1 /* SearchView.swift */,
-			);
-			path = Search;
-			sourceTree = "<group>";
-		};
 		CCDE5CF7300F78BF00D916E1 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -404,7 +394,6 @@
 				CCDE5CE9300F78BF00D916E1 /* Murmur */,
 				CCDE5CEB300F78BF00D916E1 /* Onboarding */,
 				CCDE5CED300F78BF00D916E1 /* RecycleBin */,
-				CCDE5CEF300F78BF00D916E1 /* Search */,
 				CCDE5CF7300F78BF00D916E1 /* Settings */,
 				CCDE5CFB300F78BF00D916E1 /* Sidebar */,
 				CCDE5CFD300F78BF00D916E1 /* UnsortedFiles */,
@@ -642,7 +631,6 @@
 				CCDE5D47300F78BF00D916E1 /* OnboardingView.swift in Sources */,
 				CCDE5D48300F78BF00D916E1 /* CardStyles.swift in Sources */,
 				CCDE5D49300F78BF00D916E1 /* KeychainManager.swift in Sources */,
-				CCDE5D4A300F78BF00D916E1 /* SearchView.swift in Sources */,
 				CCDE5D4B300F78BF00D916E1 /* UnsortedBanner.swift in Sources */,
 				CCDE5D4C300F78BF00D916E1 /* AppTheme.swift in Sources */,
 				CCDE5D4D300F78BF00D916E1 /* TextStyles.swift in Sources */,

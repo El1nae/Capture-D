@@ -24,6 +24,22 @@ final class DatabaseManager {
 
     // MARK: - CollectionFile
 
+    /// 创建 ImageRecord
+    func createImageRecord(imageID: String) -> ImageRecord {
+        let record = ImageRecord(imageID: imageID, capturedAt: Date())
+        modelContext.insert(record)
+        try? modelContext.save()
+        return record
+    }
+
+    /// 插入文件及其内容块
+    func insertFileWithBlock(_ file: CollectionFile, block: ContentBlock) {
+        modelContext.insert(file)
+        modelContext.insert(block)
+        file.contentBlocks.append(block)
+        try? modelContext.save()
+    }
+
     /// 创建未整理文件
     func createUnsortedFile(title: String, category: CategoryType, imageRecord: ImageRecord) -> CollectionFile {
         let file = CollectionFile(title: title, category: category, status: .unsorted)
@@ -137,6 +153,24 @@ final class DatabaseManager {
         try? modelContext.save()
     }
 
+    // MARK: - 内容块
+
+    /// 更新内容块文本
+    func updateContentBlock(_ block: ContentBlock, newText: String) {
+        block.text = newText
+        block.file?.updatedAt = Date()
+        try? modelContext.save()
+    }
+
+    /// 追加新内容块到文件
+    func appendContentBlock(to file: CollectionFile, text: String) {
+        let block = ContentBlock(text: text, isAIGenerated: false, file: file)
+        modelContext.insert(block)
+        file.contentBlocks.append(block)
+        file.updatedAt = Date()
+        try? modelContext.save()
+    }
+
     // MARK: - 删除 & 回收站
 
     /// 软删除文件
@@ -204,6 +238,24 @@ final class DatabaseManager {
         let status = FileStatus.sorted.rawValue
         let predicate = #Predicate<CollectionFile> {
             $0.statusRawValue == status && (
+                $0.title.localizedStandardContains(query) ||
+                $0.tags.contains(where: { $0.localizedStandardContains(query) })
+            )
+        }
+        let descriptor = FetchDescriptor<CollectionFile>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    /// 搜索 + 分类组合查询
+    func search(query: String, category: CategoryType) -> [CollectionFile] {
+        let raw = category.rawValue
+        let status = FileStatus.sorted.rawValue
+        let predicate = #Predicate<CollectionFile> {
+            $0.statusRawValue == status &&
+            $0.categoryRawValue == raw && (
                 $0.title.localizedStandardContains(query) ||
                 $0.tags.contains(where: { $0.localizedStandardContains(query) })
             )

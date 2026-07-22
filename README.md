@@ -16,11 +16,11 @@ CaptureD/
 ├── ADR/                      ← 架构决策记录（6 文件）
 ├── App/                      ← App 入口（2 文件）
 ├── Core/                     ← 底层服务（11 文件）
-├── Features/                 ← UI 功能模块（15 文件）
-├── Shared/                   ← 通用组件/主题/常量（12 文件）
+├── Features/                 ← UI 功能模块（14 文件）
+├── Shared/                   ← 通用组件/主题/常量（14 文件）
 ├── ShareExtension/           ← 分享扩展（1 文件）
 ├── Config/                   ← 设置指南 + 分发指南（2 文件）
-└── Resources/                ← 资源文件（待添加图标等）
+└── CaptureD/                 ← Xcode target 资源（entitlements + assets）
 ```
 
 ---
@@ -57,8 +57,8 @@ App 入口和生命周期管理。
 
 | 文件 | 职责 |
 |------|------|
-| CaptureDApp.swift | SwiftUI App 入口，启动时处理 Share Extension 写入的待处理图片 |
-| ContentView.swift | 根视图，判断是否完成引导，切换引导页或主界面 |
+| CaptureDApp.swift | SwiftUI App 入口，启动时处理 Share Extension 写入的待处理图片（含 name/tags 字段解析） |
+| ContentView.swift | 根视图，判断引导完成状态，FAB 按钮触发统一发布流程（纯文字→碎碎念，带图→选分类入库） |
 
 ---
 
@@ -73,38 +73,45 @@ App 入口和生命周期管理。
 | AI/ | DoubaoService.swift | 豆包 API 适配器 |
 | AI/ | AIManager.swift | AI 调用管理、队列化、费用计数、平台切换 |
 | AI/Prompts/ | PromptTemplates.swift | 各分类（找书/找诗/找画/找歌）的 AI 提示词模板 |
-| Database/ | Models.swift | SwiftData 数据模型（CollectionFile、ImageRecord、ContentBlock） |
-| Database/ | DatabaseManager.swift | 数据库 CRUD 操作、文件合并、回收站管理 |
+| Database/ | Models.swift | SwiftData 数据模型（CollectionFile、ImageRecord、ContentBlock: Identifiable、PendingImage 含 name/tags） |
+| Database/ | DatabaseManager.swift | 数据库 CRUD、内容块编辑/追加、搜索+分类组合查询、文件合并、回收站管理 |
 | Storage/ | PhotoStorageManager.swift | 图片文件读写、缩略图生成、空间计算 |
 | Keychain/ | KeychainManager.swift | API Key 安全存取（iOS Keychain） |
 | Network/ | NetworkManager.swift | HTTP 请求封装、错误处理 |
 
 ---
 
-### Features/（15 文件）
+### Features/（14 文件）
 按功能拆分的 UI 模块，每个子目录对应 App 的一个屏幕/功能。
 
 | 子目录 | 文件 | 职责 |
 |--------|------|------|
-| Collection/ | CollectionView.swift | 首页双列瀑布流 + 分类 tab |
+| Collection/ | CollectionView.swift | 首页双列瀑布流 + 分类 tab + 内嵌搜索栏（搜索+分类组合过滤） + 点击标题回主页 |
 | Collection/ | CategoryFilterBar.swift | 分类筛选 tab 栏（带 Safari 弹性动画） |
 | Collection/ | UnsortedBanner.swift | 固定顶部白条——未整理文件入口 |
-| Detail/ | FileDetailView.swift | 文件详情页（纯文字 + 编辑 + 左滑触发） |
-| Detail/ | ImageGalleryOverlay.swift | 左滑图片浮层（跨分类金色光晕 + tag 跳转） |
+| Detail/ | FileDetailView.swift | 文件详情页（逐条编辑铅笔按钮 + 右对齐追加按钮 + 左滑图片浮层） |
+| Detail/ | ImageGalleryOverlay.swift | 左滑图片浮层（图片撑满无白边 + 跨分类金色光晕 + tag 跳转） |
 | UnsortedFiles/ | UnsortedFilesView.swift | 未整理文件列表 + 选图 + AI 分析按钮 |
-| Search/ | SearchView.swift | 全局搜索（搜文件名和文本内容） |
+| Murmur/ | MurmurTimelineView.swift | 碎碎念时间线（Threads 风格紧凑单列布局） |
+| Murmur/ | MurmurCard.swift | 单条碎碎念卡片（Threads 风格紧凑布局，无背景色） |
 | Settings/ | SettingsView.swift | 设置主页（AI 配置/费用/存储/隐私） |
 | Settings/ | AIConfigView.swift | AI 平台选择 + API Key 输入 |
 | Settings/ | APIKeyGuideView.swift | API Key 申领指导（各平台图文步骤） |
 | Settings/ | BudgetView.swift | AI 费用管理（调用次数/费用估算/月度上限） |
 | Settings/ | StorageView.swift | 存储空间用量查看 |
 | Settings/ | PrivacyPolicyView.swift | 隐私政策页面 |
+| Settings/ | ExportView.swift | 数据导出 |
 | RecycleBin/ | RecycleBinView.swift | 回收站（恢复/清空/30 天自动清理） |
 | Onboarding/ | OnboardingView.swift | 首次引导页（3 页分步介绍） |
+| Sidebar/ | SidebarView.swift | 侧边栏（热力图 + 关键词云） |
+| Sidebar/ | HeatmapView.swift | 活跃度热力图 |
+| Sidebar/ | KeywordCloudView.swift | 关键词词云 |
+
+> **已删除**：`Search/SearchView.swift`（搜索功能已内嵌至 CollectionView）
 
 ---
 
-### Shared/（12 文件）
+### Shared/（14 文件）
 跨模块复用的组件、样式和工具。
 
 | 子目录 | 文件 | 职责 |
@@ -113,12 +120,18 @@ App 入口和生命周期管理。
 | Theme/ | ButtonStyles.swift | 分类按钮、主要按钮、次要按钮样式 |
 | Theme/ | CardStyles.swift | 浮层卡片、瀑布流卡片样式修饰符 |
 | Theme/ | TextStyles.swift | AI 注释、文件标题、正文、时间标注样式 |
-| Components/ | TimelineSeparator.swift | 时间隔断组件（类似微信时间气泡） |
-| Components/ | FloatingImageCard.swift | 浮层图片卡片（含金色光晕 + 长按触感反馈） |
+| Components/ | TimelineSeparator.swift | 时间标记（Threads 风格左对齐相对时间，无气泡底色） |
+| Components/ | FloatingImageCard.swift | 浮层图片卡片（图片撑满 + 日期左下角悬浮白字 + 金色光晕 + 长按触感） |
+| Components/ | ComposeSheet.swift | 统一输入 Sheet（碎碎念/带图发布/编辑/追加，含图片选择器+分类+tag+命名） |
+| Components/ | FABButton.swift | 全局悬浮按钮（右下角 + 号） |
 | Components/ | WaterfallGrid.swift | 双列瀑布流布局组件 |
 | Components/ | EmptyStateView.swift | 首页空白引导提示 |
+| Components/ | TagChip.swift | 单个标签胶囊 |
+| Components/ | TagFlowView.swift | 横向流式标签布局（支持 onRemove 删除） |
+| Components/ | TagInputView.swift | 标签编辑输入组件（含历史补全） |
+| Components/ | KeyboardToolbar.swift | 键盘工具栏 |
 | Extensions/ | DateExtensions.swift | 日期格式化扩展 |
-| Models/ | CategoryType.swift | 四大分类枚举定义（找书/找诗/找画/找歌） |
+| Models/ | CategoryType.swift | 五大分类枚举（找书/找诗/找画/找歌/碎碎念） |
 | Models/ | FileStatus.swift | 文件状态枚举（已整理/未整理/已删除） |
 | Constants/ | AppConstants.swift | App Group ID、文件名正则、回收站天数等全局常量 |
 
@@ -129,7 +142,7 @@ iOS Share Extension，独立 target。
 
 | 文件 | 职责 |
 |------|------|
-| ShareViewController.swift | 分享面板 UI（四个分类按钮），将图片 + 分类信息写入 App Group 共享空间，不跳转主 App |
+| ShareViewController.swift | 分享面板 UI（分类选择+命名框+标签输入），将图片+分类+name+tags 写入 App Group 共享空间 |
 
 ---
 
@@ -140,13 +153,6 @@ iOS Share Extension，独立 target。
 |------|------|
 | SETUP_GUIDE.md | Xcode 项目创建和配置的完整步骤指南 |
 | DISTRIBUTION.md | TestFlight 分发和 App Store 上架指南 |
-
----
-
-### Resources/
-资源文件目录。待添加：
-- Assets.xcassets（App 图标、颜色资源）
-- Localizable.strings（本地化字符串）
 
 ---
 
