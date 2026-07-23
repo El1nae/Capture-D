@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// 未整理文件列表 + AI 分析触发按钮
 struct UnsortedFilesView: View {
@@ -6,7 +7,7 @@ struct UnsortedFilesView: View {
     @Environment(DatabaseManager.self) private var database
     @Environment(PhotoStorageManager.self) private var storage
     @Environment(AIManager.self) private var aiManager
-    @State private var selectedFiles: Set<String> = []
+    @State private var selectedFiles: Set<PersistentIdentifier> = []
     @State private var isAnalyzing = false
     @State private var toastMessage: String?
     @State private var editingFile: CollectionFile?
@@ -56,17 +57,15 @@ struct UnsortedFilesView: View {
     }
 
     private func fileRow(_ file: CollectionFile) -> some View {
-        let fileID = file.title
+        let fileID = file.persistentModelID
         let isSelected = selectedFiles.contains(fileID)
 
         return HStack {
-            // 选择框
             Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                 .font(.system(size: AppTheme.FontSize.headline, weight: .light))
                 .foregroundStyle(isSelected ? AppTheme.Colors.accent : AppTheme.Colors.tertiaryText)
                 .onTapGesture { toggleSelection(fileID) }
 
-            // 缩略图
             if let firstImage = file.images.first,
                let thumbData = storage.loadThumbnail(id: firstImage.imageID),
                let uiImage = UIImage(data: thumbData) {
@@ -88,7 +87,6 @@ struct UnsortedFilesView: View {
 
             Spacer()
 
-            // 手动改名按钮
             Button(action: {
                 editingFile = file
                 editingName = ""
@@ -101,7 +99,6 @@ struct UnsortedFilesView: View {
         .padding(.vertical, 4)
     }
 
-    /// 底部操作栏
     private var bottomBar: some View {
         HStack {
             Text("已选 \(selectedFiles.count) 项")
@@ -153,7 +150,7 @@ struct UnsortedFilesView: View {
 
     // MARK: - Actions
 
-    private func toggleSelection(_ fileID: String) {
+    private func toggleSelection(_ fileID: PersistentIdentifier) {
         if selectedFiles.contains(fileID) {
             selectedFiles.remove(fileID)
         } else {
@@ -165,13 +162,12 @@ struct UnsortedFilesView: View {
         isAnalyzing = true
         defer { isAnalyzing = false }
 
-        let toAnalyze = files.filter { selectedFiles.contains($0.title) }
+        let toAnalyze = files.filter { selectedFiles.contains($0.persistentModelID) }
 
         for file in toAnalyze {
             guard let firstImage = file.images.first,
                   let imageData = storage.loadImage(id: firstImage.imageID) else { continue }
 
-            // 找出同一张图在其他分类的未整理文件
             let allCategoryFiles = firstImage.files.filter { $0.status == .unsorted }
             let allCategories = allCategoryFiles.map(\.category)
 
@@ -206,6 +202,7 @@ struct UnsortedFilesView: View {
         } else {
             file.title = editingName
             file.updatedAt = Date()
+            try? database.modelContext.save()
             withAnimation { toastMessage = "已重命名（格式为 作品名|作者 时会自动提升）" }
         }
 

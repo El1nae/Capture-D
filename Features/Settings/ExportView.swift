@@ -9,7 +9,7 @@ struct ExportView: View {
     @State private var exportSuccess = false
 
     private var fileCount: Int {
-        database.allSortedFiles().count + database.murmurFiles().count
+        database.allSortedFiles().count
     }
 
     var body: some View {

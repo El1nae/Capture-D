@@ -7,7 +7,7 @@ enum ActivityTracker {
     static func dailyCounts(database: DatabaseManager, days: Int = 90) -> [Date: Int] {
         let calendar = Calendar.current
         let startDate = calendar.date(byAdding: .day, value: -days, to: Date())!
-        let allFiles = database.allSortedFiles() + database.murmurFiles()
+        let allFiles = database.allSortedFiles()
 
         var counts: [Date: Int] = [:]
         for file in allFiles {

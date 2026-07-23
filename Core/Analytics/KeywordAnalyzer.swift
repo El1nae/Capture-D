@@ -15,7 +15,7 @@ enum KeywordAnalyzer {
     static func analyze(database: DatabaseManager, topN: Int = 50) -> [(word: String, count: Int)] {
         var allText = ""
 
-        let files = database.allSortedFiles() + database.murmurFiles()
+        let files = database.allSortedFiles()
         for file in files {
             allText += " " + file.title
             allText += " " + file.tags.joined(separator: " ")

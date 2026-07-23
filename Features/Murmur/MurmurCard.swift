@@ -5,8 +5,7 @@ struct MurmurCard: View {
     let file: CollectionFile
 
     private var displayText: String {
-        file.contentBlocks
-            .sorted { $0.createdAt < $1.createdAt }
+        file.sortedBlocks
             .map(\.text)
             .joined(separator: "\n")
     }

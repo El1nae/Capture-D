@@ -1,37 +1,75 @@
 import Foundation
 
+private enum DateFormatters {
+    static let unsorted: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd HH:mm"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+
+    static let yearMonthDay: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy年M月d日"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+
+    static let imageStamp: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy.MM.dd"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+
+    static let monthDayTime: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "M月d日 HH:mm"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+
+    static let monthDay: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "M月d日"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+
+    static let fullDateTime: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy年M月d日 HH:mm"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+
+    static let fullDate: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy年M月d日"
+        f.locale = Locale(identifier: "zh_CN")
+        return f
+    }()
+}
+
 extension Date {
-    /// 生成未整理文件的默认文件名（存入时间）
     var unsortedFileName: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        formatter.locale = Locale(identifier: "zh_CN")
-        return formatter.string(from: self)
+        DateFormatters.unsorted.string(from: self)
     }
 
-    /// 时间隔断显示用（年月日）
     var timelineDateString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年M月d日"
-        formatter.locale = Locale(identifier: "zh_CN")
-        return formatter.string(from: self)
+        DateFormatters.yearMonthDay.string(from: self)
     }
 
-    /// 图片时间标注（年月日）
     var imageTimestamp: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd"
-        formatter.locale = Locale(identifier: "zh_CN")
-        return formatter.string(from: self)
+        DateFormatters.imageStamp.string(from: self)
     }
 
-    /// 距今天数
     func daysFromNow() -> Int {
         Calendar.current.dateComponents([.day], from: self, to: Date()).day ?? 0
     }
 
-    /// 瀑布流卡片用的简短时间显示
-    var timelineBrief: String {
+    /// 相对时间显示。includeTime=true 在"昨天"及更早时附带具体时间
+    func relativeDisplay(includeTime: Bool = false) -> String {
         let calendar = Calendar.current
         let now = Date()
         let minutesDiff = Int(now.timeIntervalSince(self) / 60)
@@ -42,15 +80,23 @@ extension Date {
             return "\(hoursDiff)小时前"
         }
         if calendar.isDateInYesterday(self) {
+            if includeTime {
+                return "昨天 \(self.formatted(date: .omitted, time: .shortened))"
+            }
             return "昨天"
         }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
         if calendar.isDate(self, equalTo: now, toGranularity: .year) {
-            formatter.dateFormat = "M月d日"
-        } else {
-            formatter.dateFormat = "yyyy年M月d日"
+            return includeTime
+                ? DateFormatters.monthDayTime.string(from: self)
+                : DateFormatters.monthDay.string(from: self)
         }
-        return formatter.string(from: self)
+        return includeTime
+            ? DateFormatters.fullDateTime.string(from: self)
+            : DateFormatters.fullDate.string(from: self)
+    }
+
+    /// 瀑布流卡片用的简短时间（不含具体时间）
+    var timelineBrief: String {
+        relativeDisplay(includeTime: false)
     }
 }

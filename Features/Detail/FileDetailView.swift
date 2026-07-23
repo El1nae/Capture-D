@@ -102,7 +102,6 @@ struct FileDetailView: View {
                 .transition(.move(edge: .trailing))
             }
         }
-        .navigationTitle(file.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -167,7 +166,11 @@ struct FileDetailView: View {
             }
             Button("删除", role: .destructive) {
                 if let block = blockToDelete {
+                    let isLastMurmurBlock = file.category == .murmur && file.contentBlocks.count <= 1
                     database.deleteContentBlock(block)
+                    if isLastMurmurBlock {
+                        dismiss()
+                    }
                 } else {
                     database.softDelete(file)
                     dismiss()
@@ -206,6 +209,6 @@ struct FileDetailView: View {
     }
 
     private var sortedBlocks: [ContentBlock] {
-        file.contentBlocks.sorted { $0.createdAt < $1.createdAt }
+        file.sortedBlocks
     }
 }

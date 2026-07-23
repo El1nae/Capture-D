@@ -6,8 +6,7 @@ struct SettingsView: View {
     @Environment(PhotoStorageManager.self) private var storage
 
     var body: some View {
-        NavigationStack {
-            List {
+        List {
                 // MARK: - AI 配置
                 Section {
                     NavigationLink {
@@ -103,8 +102,8 @@ struct SettingsView: View {
                         .textCase(.uppercase)
                 }
             }
-            .navigationTitle("设置")
-        }
+        .navigationTitle("设置")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var budgetSubtitle: String {

@@ -139,6 +139,10 @@ final class DatabaseManager {
             target.images.append(image)
             image.files.append(target)
         }
+        // 清理 source 在 ImageRecord.files 中的反向引用
+        for image in source.images {
+            image.files.removeAll { $0.persistentModelID == source.persistentModelID }
+        }
         if let content = newContent, !content.isEmpty {
             let block = ContentBlock(text: content, isAIGenerated: true, file: target)
             modelContext.insert(block)
@@ -158,7 +162,15 @@ final class DatabaseManager {
     /// 更新内容块文本
     func updateContentBlock(_ block: ContentBlock, newText: String) {
         block.text = newText
-        block.file?.updatedAt = Date()
+        if let file = block.file {
+            file.updatedAt = Date()
+            if file.category == .murmur {
+                let firstBlock = file.contentBlocks.sorted { $0.createdAt < $1.createdAt }.first
+                if firstBlock?.persistentModelID == block.persistentModelID {
+                    file.title = String(newText.prefix(50))
+                }
+            }
+        }
         try? modelContext.save()
     }
 
@@ -171,14 +183,19 @@ final class DatabaseManager {
         try? modelContext.save()
     }
 
-    /// 删除单条内容块
+    /// 删除单条内容块（碎碎念删除最后一条时自动归入回收站）
     func deleteContentBlock(_ block: ContentBlock) {
-        if let file = block.file {
+        let file = block.file
+        if let file {
             file.contentBlocks.removeAll { $0.persistentModelID == block.persistentModelID }
             file.updatedAt = Date()
         }
         modelContext.delete(block)
-        try? modelContext.save()
+        if let file, file.contentBlocks.isEmpty && file.category == .murmur {
+            softDelete(file)
+        } else {
+            try? modelContext.save()
+        }
     }
 
     // MARK: - 删除 & 回收站
@@ -243,7 +260,7 @@ final class DatabaseManager {
 
     // MARK: - 搜索
 
-    /// 全局搜索（搜标题和标签，只搜已整理文件）
+    /// 全局搜索（搜标题、标签和内容，只搜已整理文件）
     func search(query: String) -> [CollectionFile] {
         let status = FileStatus.sorted.rawValue
         let predicate = #Predicate<CollectionFile> {
@@ -256,7 +273,22 @@ final class DatabaseManager {
             predicate: predicate,
             sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
         )
-        return (try? modelContext.fetch(descriptor)) ?? []
+        var results = (try? modelContext.fetch(descriptor)) ?? []
+        let resultIDs = Set(results.map(\.persistentModelID))
+
+        let blockPredicate = #Predicate<ContentBlock> {
+            $0.text.localizedStandardContains(query)
+        }
+        let blockDescriptor = FetchDescriptor<ContentBlock>(predicate: blockPredicate)
+        let matchedBlocks = (try? modelContext.fetch(blockDescriptor)) ?? []
+        for block in matchedBlocks {
+            if let file = block.file,
+               file.statusRawValue == status,
+               !resultIDs.contains(file.persistentModelID) {
+                results.append(file)
+            }
+        }
+        return results.sorted { $0.updatedAt > $1.updatedAt }
     }
 
     /// 搜索 + 分类组合查询
@@ -274,7 +306,23 @@ final class DatabaseManager {
             predicate: predicate,
             sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
         )
-        return (try? modelContext.fetch(descriptor)) ?? []
+        var results = (try? modelContext.fetch(descriptor)) ?? []
+        let resultIDs = Set(results.map(\.persistentModelID))
+
+        let blockPredicate = #Predicate<ContentBlock> {
+            $0.text.localizedStandardContains(query)
+        }
+        let blockDescriptor = FetchDescriptor<ContentBlock>(predicate: blockPredicate)
+        let matchedBlocks = (try? modelContext.fetch(blockDescriptor)) ?? []
+        for block in matchedBlocks {
+            if let file = block.file,
+               file.statusRawValue == status,
+               file.categoryRawValue == raw,
+               !resultIDs.contains(file.persistentModelID) {
+                results.append(file)
+            }
+        }
+        return results.sorted { $0.updatedAt > $1.updatedAt }
     }
 
     // MARK: - 标签

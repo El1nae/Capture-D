@@ -53,6 +53,10 @@ final class CollectionFile {
         set { statusRawValue = newValue.rawValue }
     }
 
+    var sortedBlocks: [ContentBlock] {
+        contentBlocks.sorted { $0.createdAt < $1.createdAt }
+    }
+
     init(title: String, category: CategoryType, status: FileStatus = .unsorted) {
         self.title = title
         self.categoryRawValue = category.rawValue

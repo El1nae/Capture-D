@@ -6,20 +6,26 @@ import UIKit
 final class ExportManager {
     let database: DatabaseManager
     let storage: PhotoStorageManager
+    private static let isoFormatter = ISO8601DateFormatter()
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
 
     init(database: DatabaseManager, storage: PhotoStorageManager) {
         self.database = database
         self.storage = storage
     }
 
-    /// 生成导出 ZIP 文件并返回路径
     func exportAll() throws -> URL {
         let fm = FileManager.default
         let tempDir = fm.temporaryDirectory.appendingPathComponent("CaptureD_Export_\(UUID().uuidString)")
         let imagesDir = tempDir.appendingPathComponent("images")
         try fm.createDirectory(at: imagesDir, withIntermediateDirectories: true)
+        let iso = Self.isoFormatter
 
-        let allFiles = database.allSortedFiles() + database.murmurFiles() + database.deletedFiles()
+        let allFiles = database.allSortedFiles() + database.deletedFiles()
 
         var fileExports: [[String: Any]] = []
         var imageIDs: Set<String> = []
@@ -30,19 +36,19 @@ final class ExportManager {
                 "category": file.categoryRawValue,
                 "status": file.statusRawValue,
                 "tags": file.tags,
-                "createdAt": ISO8601DateFormatter().string(from: file.createdAt),
-                "updatedAt": ISO8601DateFormatter().string(from: file.updatedAt)
+                "createdAt": iso.string(from: file.createdAt),
+                "updatedAt": iso.string(from: file.updatedAt)
             ]
             if let deletedAt = file.deletedAt {
-                fileDict["deletedAt"] = ISO8601DateFormatter().string(from: deletedAt)
+                fileDict["deletedAt"] = iso.string(from: deletedAt)
             }
 
             var blocks: [[String: Any]] = []
-            for block in file.contentBlocks.sorted(by: { $0.createdAt < $1.createdAt }) {
+            for block in file.sortedBlocks {
                 blocks.append([
                     "text": block.text,
                     "isAIGenerated": block.isAIGenerated,
-                    "createdAt": ISO8601DateFormatter().string(from: block.createdAt)
+                    "createdAt": iso.string(from: block.createdAt)
                 ])
             }
             fileDict["contentBlocks"] = blocks
@@ -64,13 +70,13 @@ final class ExportManager {
 
         let exportData: [String: Any] = [
             "version": 1,
-            "exportDate": ISO8601DateFormatter().string(from: Date()),
+            "exportDate": iso.string(from: Date()),
             "files": fileExports
         ]
         let jsonData = try JSONSerialization.data(withJSONObject: exportData, options: [.prettyPrinted, .sortedKeys])
         try jsonData.write(to: tempDir.appendingPathComponent("data.json"))
 
-        let zipURL = fm.temporaryDirectory.appendingPathComponent("CaptureD_Backup_\(formattedDate()).zip")
+        let zipURL = fm.temporaryDirectory.appendingPathComponent("CaptureD_Backup_\(Self.dateFormatter.string(from: Date())).zip")
         if fm.fileExists(atPath: zipURL.path) {
             try fm.removeItem(at: zipURL)
         }
@@ -86,15 +92,8 @@ final class ExportManager {
         return zipURL
     }
 
-    /// 通过系统分享面板分享 ZIP 文件
     func share(zipURL: URL, from viewController: UIViewController) {
         let activity = UIActivityViewController(activityItems: [zipURL], applicationActivities: nil)
         viewController.present(activity, animated: true)
-    }
-
-    private func formattedDate() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: Date())
     }
 }
