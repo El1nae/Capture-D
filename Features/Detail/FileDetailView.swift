@@ -1,15 +1,18 @@
 import SwiftUI
 
-/// 文件详情页 — 时间线内容 + 逐条编辑 + 追加 + 左滑图片浮层
+/// 文件详情页 — 时间线内容 + 逐条编辑/删除 + 追加 + 左滑图片浮层
 struct FileDetailView: View {
     let file: CollectionFile
     @Environment(DatabaseManager.self) private var database
     @Environment(PhotoStorageManager.self) private var storage
+    @Environment(\.dismiss) private var dismiss
     @State private var showImageGallery = false
     @State private var isEditingTags = false
     @State private var editableTags: [String] = []
     @State private var editingBlock: ContentBlock?
     @State private var showAppendSheet = false
+    @State private var showDeleteAlert = false
+    @State private var blockToDelete: ContentBlock?
 
     var body: some View {
         ZStack {
@@ -22,24 +25,40 @@ struct FileDetailView: View {
                             .padding(.bottom, AppTheme.Spacing.sm)
                     }
 
-                    ForEach(sortedBlocks, id: \.createdAt) { block in
-                        TimelineSeparator(date: block.createdAt)
+                    ForEach(sortedBlocks, id: \.persistentModelID) { block in
+                        VStack(alignment: .leading, spacing: 0) {
+                            TimelineSeparator(date: block.createdAt)
 
-                        HStack(alignment: .top, spacing: 4) {
-                            Text(block.text)
-                                .bodyTextStyle()
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                            HStack(alignment: .top, spacing: 4) {
+                                Text(block.text)
+                                    .bodyTextStyle()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                            Button(action: { editingBlock = block }) {
-                                Image(systemName: "pencil")
-                                    .font(.system(size: 13, weight: .light))
-                                    .foregroundStyle(AppTheme.Colors.tertiaryText)
+                                Button(action: { editingBlock = block }) {
+                                    Image(systemName: "pencil")
+                                        .font(.system(size: 13, weight: .light))
+                                        .foregroundStyle(AppTheme.Colors.tertiaryText)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.top, 2)
                             }
-                            .buttonStyle(.plain)
-                            .padding(.top, 2)
+                            .padding(.horizontal, AppTheme.Spacing.md)
+                            .padding(.bottom, AppTheme.Spacing.sm)
+
+                            Divider()
+                                .padding(.leading, AppTheme.Spacing.md)
                         }
-                        .padding(.horizontal, AppTheme.Spacing.md)
-                        .padding(.bottom, AppTheme.Spacing.sm)
+                        .contextMenu {
+                            Button(action: { editingBlock = block }) {
+                                Label("编辑", systemImage: "pencil")
+                            }
+                            Button(role: .destructive, action: {
+                                blockToDelete = block
+                                showDeleteAlert = true
+                            }) {
+                                Label("删除", systemImage: "trash")
+                            }
+                        }
                     }
 
                     if sortedBlocks.isEmpty {
@@ -94,13 +113,23 @@ struct FileDetailView: View {
                     .lineLimit(1)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    editableTags = file.tags
-                    isEditingTags.toggle()
-                }) {
-                    Text(isEditingTags ? "完成" : "编辑")
-                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.body, weight: .light))
-                        .tracking(0.5)
+                Menu {
+                    Button(action: {
+                        editableTags = file.tags
+                        isEditingTags.toggle()
+                    }) {
+                        Label(isEditingTags ? "完成标签编辑" : "编辑标签", systemImage: "tag")
+                    }
+                    Divider()
+                    Button(role: .destructive, action: {
+                        showDeleteAlert = true
+                        blockToDelete = nil
+                    }) {
+                        Label("删除", systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: AppTheme.FontSize.headline, weight: .light))
                         .foregroundStyle(AppTheme.Colors.accent)
                 }
             }
@@ -108,7 +137,7 @@ struct FileDetailView: View {
         .gesture(
             DragGesture(minimumDistance: 50)
                 .onEnded { value in
-                    if value.translation.width < -50 {
+                    if value.translation.width < -50 && !file.images.isEmpty {
                         withAnimation(AppTheme.Animation.standard) {
                             showImageGallery = true
                         }
@@ -130,6 +159,26 @@ struct FileDetailView: View {
                 navTitle: "追加内容"
             ) { text in
                 database.appendContentBlock(to: file, text: text)
+            }
+        }
+        .alert("确认删除", isPresented: $showDeleteAlert) {
+            Button("取消", role: .cancel) {
+                blockToDelete = nil
+            }
+            Button("删除", role: .destructive) {
+                if let block = blockToDelete {
+                    database.deleteContentBlock(block)
+                } else {
+                    database.softDelete(file)
+                    dismiss()
+                }
+                blockToDelete = nil
+            }
+        } message: {
+            if blockToDelete != nil {
+                Text("删除后无法恢复这条内容")
+            } else {
+                Text("将移入回收站，30天后永久删除")
             }
         }
     }

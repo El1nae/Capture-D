@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 碎碎念时间线 — Threads 式紧凑单列布局
+/// 碎碎念时间线 — Threads 式紧凑单列布局，每条可点击进入详情
 struct MurmurTimelineView: View {
     @Environment(DatabaseManager.self) private var database
 
@@ -15,10 +15,15 @@ struct MurmurTimelineView: View {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     ForEach(files, id: \.persistentModelID) { file in
-                        TimelineSeparator(date: file.createdAt)
-                        MurmurCard(file: file)
-                        Divider()
-                            .padding(.leading, AppTheme.Spacing.md)
+                        NavigationLink(destination: FileDetailView(file: file)) {
+                            VStack(spacing: 0) {
+                                TimelineSeparator(date: file.createdAt)
+                                MurmurCard(file: file)
+                                Divider()
+                                    .padding(.leading, AppTheme.Spacing.md)
+                            }
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.bottom, 80)

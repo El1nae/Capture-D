@@ -195,15 +195,28 @@ struct CollectionView: View {
                         .padding(.bottom, 2)
                 }
 
-                Text(file.title)
-                    .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .regular))
-                    .foregroundStyle(AppTheme.Colors.primaryText)
-                    .lineLimit(2)
+                if file.category == .murmur {
+                    Text(file.createdAt.timelineBrief)
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .light))
+                        .tracking(0.4)
+                        .foregroundStyle(AppTheme.Colors.tertiaryText)
+                        .padding(.bottom, 1)
 
-                Text(file.category.rawValue)
-                    .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .light))
-                    .tracking(0.6)
-                    .foregroundStyle(AppTheme.Colors.tertiaryText)
+                    Text(file.title)
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .regular))
+                        .foregroundStyle(AppTheme.Colors.primaryText)
+                        .lineLimit(3)
+                } else {
+                    Text(file.title)
+                        .font(AppTheme.Fonts.serif(AppTheme.FontSize.caption, weight: .regular))
+                        .foregroundStyle(AppTheme.Colors.primaryText)
+                        .lineLimit(2)
+
+                    Text(file.category.rawValue)
+                        .font(AppTheme.Fonts.sans(AppTheme.FontSize.footnote, weight: .light))
+                        .tracking(0.6)
+                        .foregroundStyle(AppTheme.Colors.tertiaryText)
+                }
             }
             .padding(.horizontal, AppTheme.Spacing.sm)
             .padding(.bottom, AppTheme.Spacing.sm)

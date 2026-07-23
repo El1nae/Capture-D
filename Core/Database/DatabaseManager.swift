@@ -171,6 +171,16 @@ final class DatabaseManager {
         try? modelContext.save()
     }
 
+    /// 删除单条内容块
+    func deleteContentBlock(_ block: ContentBlock) {
+        if let file = block.file {
+            file.contentBlocks.removeAll { $0.persistentModelID == block.persistentModelID }
+            file.updatedAt = Date()
+        }
+        modelContext.delete(block)
+        try? modelContext.save()
+    }
+
     // MARK: - 删除 & 回收站
 
     /// 软删除文件
@@ -309,7 +319,8 @@ final class DatabaseManager {
 
     /// 创建碎碎念（直接为 sorted 状态，跳过 unsorted 流程）
     func createMurmur(text: String, tags: [String] = []) -> CollectionFile {
-        let file = CollectionFile(title: Date().unsortedFileName, category: .murmur, status: .sorted)
+        let title = String(text.prefix(50))
+        let file = CollectionFile(title: title, category: .murmur, status: .sorted)
         file.tags = tags
         let block = ContentBlock(text: text, isAIGenerated: false, file: file)
         modelContext.insert(file)

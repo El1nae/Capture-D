@@ -19,8 +19,8 @@ struct ContentView: View {
             .sheet(isPresented: $showCompose) {
                 ComposeSheet(
                     placeholder: "记录此刻的想法...",
-                    navTitle: "碎碎念",
-                    mode: .murmur
+                    navTitle: "新内容",
+                    mode: .compose
                 ) { result in
                     handlePublish(result)
                 }
@@ -32,6 +32,7 @@ struct ContentView: View {
 
     private func handlePublish(_ result: ComposeResult) {
         if let imageData = result.imageData {
+            // 带图 → 走分类发布流程
             let imageID = storage.saveImage(imageData)
             let imageRecord = database.createImageRecord(imageID: imageID)
 
@@ -48,6 +49,7 @@ struct ContentView: View {
                 database.insertFileWithBlock(file, block: block)
             }
         } else {
+            // 纯文本 → 自动归类为碎碎念
             _ = database.createMurmur(text: result.text, tags: result.tags)
         }
     }

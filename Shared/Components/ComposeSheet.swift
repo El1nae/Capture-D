@@ -1,12 +1,12 @@
 import SwiftUI
 import PhotosUI
 
-/// 统一输入 Sheet — 碎碎念/带图发布/内容编辑/追加
+/// 统一输入 Sheet — 纯文本自动归为碎碎念，带图走分类发布
 struct ComposeSheet: View {
     let placeholder: String
     let navTitle: String
     var initialText: String = ""
-    var mode: ComposeMode = .murmur
+    var mode: ComposeMode = .compose
     let onPublish: (ComposeResult) -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var text = ""
@@ -19,7 +19,7 @@ struct ComposeSheet: View {
     @FocusState private var isFocused: Bool
 
     enum ComposeMode {
-        case murmur
+        case compose
         case editBlock
     }
 
@@ -29,7 +29,7 @@ struct ComposeSheet: View {
                 VStack(spacing: 12) {
                     textArea
 
-                    if mode == .murmur {
+                    if mode == .compose {
                         imagePickerSection
                     }
 
@@ -60,7 +60,7 @@ struct ComposeSheet: View {
                 KeyboardToolbar()
             }
         }
-        .presentationDetents([.fraction(0.45)])
+        .presentationDetents(selectedImageData != nil ? [.fraction(0.85)] : [.fraction(0.45)])
         .onAppear {
             text = initialText
             isFocused = true
